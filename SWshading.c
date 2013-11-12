@@ -152,7 +152,8 @@ int main(int argc, char *argv[]) {
 		double cos_t = 1.;//cos(time+M_PI/2.);
 		double sin_t = (fabs(sin(2.*time)) / 4.) + 0.5;
 		int offset = 0;
-		int thresh = 255;
+		int thresh = 256;
+
 	    // Regenerate all the texture data on the CPU for every frame
 	    for(i=0; i<IMAGE_SIZE; i++)
 		{
@@ -164,8 +165,10 @@ int main(int argc, char *argv[]) {
 				y = (double)j / IMAGE_SIZE;
 				double perl_noise1 = 128 + 127*noise3(4.0*x, 4.0*y, 0.2*time);
 				double perl_noise2 = 128 + 127*noise3(12.0*x, 12.0*y, 0.4*time);
+				double perl_noise3 = 128 + 127*noise3(40.0*x, 40.0*y, 0.6*time);
+
 				// Perlin noise
-				red = perl_noise1*0.85+perl_noise2*0.15;
+				red = perl_noise1*0.85+perl_noise2*0.12+perl_noise3*0.03;
 				grn = red;//perl_noise2;//*sin_t;
 				blu = 255;//0.75*red + 0.25*grn;//perl_noise2*cos_t;
 				// Cellular (Worley) noise
@@ -175,18 +178,14 @@ int main(int argc, char *argv[]) {
 				Worley(point, 2, F, delta, ID);
 				red = 120*(F[1]-F[0]);*/
 
-				red = red*red/255;
-				grn = grn*grn/255;
+				if(red < thresh) red = red*red/255 + 40;
+				if(grn < thresh) grn = grn*grn/255 + 40;
 
-				/*if(red > thresh) red = 255;
-				if(grn > thresh) grn = 255;*/
-			
-				if(k > 0)	offset = -1;
 
 				k = (i + j*IMAGE_SIZE)*4;
-				pixels[k] = red + pixels[k+offset];
-				pixels[k + 1] = grn + pixels[k+offset];;
-				pixels[k + 2] = blu + pixels[k+offset];;
+				pixels[k] = red;
+				pixels[k + 1] = grn;
+				pixels[k + 2] = blu;
 				pixels[k + 3] = 255;
 				offset = 0;
 		    }
