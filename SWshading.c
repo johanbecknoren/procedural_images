@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
 		double cos_t = 1.;//cos(time+M_PI/2.);
 		double sin_t = (fabs(sin(2.*time)) / 4.) + 0.5;
 		int offset = 0;
-		int thresh = 256;
+		int thresh = 120;
 
 	    // Regenerate all the texture data on the CPU for every frame
 	    for(i=0; i<IMAGE_SIZE; i++)
@@ -165,7 +165,7 @@ int main(int argc, char *argv[]) {
 				y = (double)j / IMAGE_SIZE;
 				double perl_noise1 = 128 + 127*noise3(4.0*x, 4.0*y, 0.2*time);
 				double perl_noise2 = 128 + 127*noise3(12.0*x, 12.0*y, 0.4*time);
-				double perl_noise3 = 128 + 127*noise3(40.0*x, 40.0*y, 0.6*time);
+				double perl_noise3 = 128 + 127*noise3(30.0*x, 30.0*y, 0.8*time);
 
 				// Perlin noise
 				red = perl_noise1*0.85+perl_noise2*0.12+perl_noise3*0.03;
@@ -178,8 +178,11 @@ int main(int argc, char *argv[]) {
 				Worley(point, 2, F, delta, ID);
 				red = 120*(F[1]-F[0]);*/
 
-				if(red < thresh) red = red*red/255 + 40;
-				if(grn < thresh) grn = grn*grn/255 + 40;
+				red = red*red/255 + 40;
+				grn = grn*grn/255 + 40;
+
+				/*if(red < thresh) red = 0;
+				if(grn < thresh) grn = 0;*/
 
 
 				k = (i + j*IMAGE_SIZE)*4;
