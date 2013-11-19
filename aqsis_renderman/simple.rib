@@ -25,6 +25,8 @@ AttributeBegin
   Surface "apple" # "Ka" [1] "Kd" [0.9] "Ks" 1 "roughness" 0.1
   TransformBegin
     Rotate 90 1 0 0   # Rotate +z to +y. "Up" in default camera coordinates is +y,
+		Rotate 45 0 -1 0
+		Rotate 45 -1 0 0
     Sphere 1 -1 1 360 # but the Sphere primitive has its poles on the z axis.
   TransformEnd
  
