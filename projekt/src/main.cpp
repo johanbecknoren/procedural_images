@@ -53,6 +53,7 @@ int main(int argc, char** argv) {
 		std::cout<<"Error init GLFW\n";
 		return 0;
 	}
+
 	glClearColor(real(0),real(0),real(0),real(0));
 	glfwSwapInterval(0);
 	glfwSetKeyCallback((GLFWkeyfun)key_callback);
@@ -62,7 +63,7 @@ int main(int argc, char** argv) {
 	for(size_t i=0; i< 3*kWidth*kHeight; i += 3) {
 		pixels[i + 0] = real(0.5);
 		pixels[i + 1] = real(0.5);
-		pixels[i + 2] = real(0.8);
+		pixels[i + 2] = real(1.0);
 	}
 
 	float currentTime, lastTime = 0.0f;
@@ -88,7 +89,5 @@ int main(int argc, char** argv) {
 		}
 	}
 	glfwTerminate();
-	//char c;
-	//std::cin>>c;
 	return 0;
 }

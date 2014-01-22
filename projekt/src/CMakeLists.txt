@@ -56,6 +56,13 @@ link_directories(
 	${CMAKE_SOURCE_DIR}/externals/libs
 	) 
 
+set(SHADER_FILES
+  ${CMAKE_SOURCE_DIR}/shaders/mainshader.frag
+  ${CMAKE_SOURCE_DIR}/shaders/mainshader.vert
+)
+
+source_group("The Shaders" FILES ${SHADER_FILES})
+
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/export)
 
 if(CMAKE_CURRENT_BINARY_DIR)
@@ -66,10 +73,11 @@ endif()
 get_filename_component(PARENT_DIR ${CMAKE_SOURCE_DIR} PATH)
 add_definitions(-DCMAKE_SOURCE_DIR=\"${PARENT_DIR}\")
 
-add_executable(schumacher ${HEADERS} ${SRCS} )
+#add_executable(schumacher ${HEADERS} ${SRCS})
+add_executable(schumacher ${HEADERS} ${SRCS} ${SHADER_FILES})
 
 if(WIN32)
-	target_link_libraries(schumacher GLFW.lib FreeImage.lib freeglut.lib assimp.lib)
+	target_link_libraries(schumacher GLFW.lib FreeImage.lib freeglut.lib assimp.lib opengl32.lib)
 endif(WIN32)
 
 if(UNIX)
