@@ -77,7 +77,7 @@ add_definitions(-DCMAKE_SOURCE_DIR=\"${PARENT_DIR}\")
 add_executable(schumacher ${HEADERS} ${SRCS} ${SHADER_FILES})
 
 if(WIN32)
-	target_link_libraries(schumacher GLFW.lib FreeImage.lib freeglut.lib assimp.lib opengl32.lib)
+	target_link_libraries(schumacher GLFW.lib FreeImage.lib freeglut.lib assimp.lib opengl32.lib glew32.lib)
 endif(WIN32)
 
 if(UNIX)

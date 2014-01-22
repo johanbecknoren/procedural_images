@@ -7,6 +7,10 @@
 
 Camera cam(kWidth, kHeight);
 
+GLfloat verts[9] = {0.0f,0.0f,0.0f, 0.0f,1.0f,0.0f, 1.0f,1.0f,0.0f};
+GLfloat normal[3] = {0.0f,0.0f,-1.0f};
+GLfloat colors[9] = {0.0f,0.0f,0.0f, 0.0f,1.0f,0.0f, 1.0f,1.0f,0.0f};
+
 // Callback functions for GLFW window context
 static void key_callback(int key, int action ,int mods) {
 	std::cout<<"key="<<key<<std::endl;
@@ -45,7 +49,7 @@ static void handle_mouse_move(double mouse_x, double mouse_y) {
 int main(int argc, char** argv) {
 
 	//Camera cam(kWidth,kHeight);
-
+	glewInit();
 	// Init GLFW stuff
 	glfwInit();
 	if(!glfwOpenWindow(kWidth, kHeight, 8,8,8,8, 32, 0, GLFW_WINDOW)) {
@@ -79,6 +83,7 @@ int main(int argc, char** argv) {
 		cam.move(deltaT);
 
 		// Render stuff here!
+		// E.g terrain.render(cam.getModelView(), cam.getProjection());
 		glDrawPixels(kWidth, kHeight, GL_RGB, GL_FLOAT, pixels);
 
 		// Swap buffers
