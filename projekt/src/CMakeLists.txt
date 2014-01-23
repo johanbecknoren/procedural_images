@@ -12,7 +12,7 @@ FILE(GLOB SRCS  ./*.cpp)
 option (USE_OPENGL
   "Use openGL to render scene while calculating" ON)
 
-list(APPEND schumacher_INCLUDE_DIRS
+list(APPEND terrain_INCLUDE_DIRS
 	${CMAKE_SOURCE_DIR}/externals
 	${CMAKE_SOURCE_DIR}/externals/glm
 	${CMAKE_SOURCE_DIR}/externals/assimp
@@ -21,7 +21,7 @@ list(APPEND schumacher_INCLUDE_DIRS
 )
 
 if (USE_OPENGL)
-  list(APPEND schumacher_INCLUDE_DIRS
+  list(APPEND terrain_INCLUDE_DIRS
 	${CMAKE_SOURCE_DIR}/externals/GL
 	${CMAKE_SOURCE_DIR}/externals/GL/GL)
   set(EXTRA_LIBS ${EXTRA_LIBS} GL glfw glut)
@@ -29,7 +29,7 @@ if (USE_OPENGL)
 endif (USE_OPENGL)
 
 # Random generator stuff
-list(APPEND schumacher_INCLUDE_DIRS
+list(APPEND terrain_INCLUDE_DIRS
 	${CMAKE_SOURCE_DIR}/sfmt
 )
 
@@ -49,7 +49,7 @@ add_definitions(-DSFMT_MEXP=19937)
 ####
 
 include_directories(	
-	${schumacher_INCLUDE_DIRS}
+	${terrain_INCLUDE_DIRS}
 	)
 
 link_directories(
@@ -74,14 +74,12 @@ get_filename_component(PARENT_DIR ${CMAKE_SOURCE_DIR} PATH)
 add_definitions(-DCMAKE_SOURCE_DIR=\"${PARENT_DIR}\")
 
 #add_executable(schumacher ${HEADERS} ${SRCS})
-add_executable(schumacher ${HEADERS} ${SRCS} ${SHADER_FILES})
+add_executable(terrain ${HEADERS} ${SRCS} ${SHADER_FILES})
 
 if(WIN32)
-	target_link_libraries(schumacher GLFW.lib FreeImage.lib freeglut.lib assimp.lib opengl32.lib glew32.lib)
+	target_link_libraries(terrain GLFW.lib FreeImage.lib freeglut.lib assimp.lib opengl32.lib glew32.lib)
 endif(WIN32)
 
 if(UNIX)
-	target_link_libraries(schumacher freeimage assimp ${EXTRA_LIBS})
+	target_link_libraries(terrain freeimage assimp ${EXTRA_LIBS})
 endif(UNIX)
-
-
