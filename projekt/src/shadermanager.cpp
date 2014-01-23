@@ -9,7 +9,6 @@
 #include "gl/glfw.h"
 #include "utils.h"
 
-namespace core {
 
 ShaderManager::ShaderManager() {
 }
@@ -122,7 +121,7 @@ bool ShaderManager::loadShaders(std::string vertFileName, std::string fragFileNa
 }
 std::string ShaderManager::fixPath(std::string localPath) {
 	std::stringstream fullPath(CMAKE_PROJECT_ROOT_DIR);
-	fullPath << CMAKE_PROJECT_ROOT_DIR << "/src/core/shaders/" << localPath;
+	fullPath << CMAKE_PROJECT_ROOT_DIR << "/src/shaders/" << localPath;
 	return fullPath.str();
 }
 
@@ -168,5 +167,4 @@ GLuint ShaderManager::loadShaderG(const char *vertFileName, const char *fragFile
 	glUseProgram(0);
 	return p;
 }
-} //namespace core
 // End of ShaderLoader

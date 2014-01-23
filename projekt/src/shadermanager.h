@@ -4,7 +4,6 @@
 #include <string>
 #include <array>
 
-namespace core {
 class ShaderManager {
 public:
 	ShaderManager();
@@ -12,7 +11,7 @@ public:
 	};
 	
 	enum shaderId {
-		BASIC = 0,
+		MAIN = 0,
 		COLOR_CUBE = 1,
 		TEX2SCREEN = 2
 	};
@@ -36,6 +35,5 @@ private:
 	std::array<unsigned int, numShaders> shaders;
 	
 };
-} //namespace core
 
 #endif

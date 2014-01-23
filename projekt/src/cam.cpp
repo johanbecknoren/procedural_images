@@ -20,7 +20,7 @@ Camera::Camera(int theWindowWidth, int theWindowHeight)
 	windowMidX = windowWidth  / 2;
 	windowMidY = windowHeight / 2;
 
-	projection = glm::perspective(45.0f, (float)640 / (float)480, 1.0f, 200.0f);
+	projection = glm::perspective(45.0f, (float)windowWidth / (float)windowHeight, 1.0f, 200.0f);
 
 	//glfwSetCursorPos(window, windowMidX, windowMidY);
 	glfwSetMousePos(windowMidX,windowMidY);
@@ -65,9 +65,9 @@ void Camera::handleMouseMove(int mouseX, int mouseY)
 	float horizMovement = (mouseX - windowMidX+1) * yawSensitivity;
 	float vertMovement  = (mouseY - windowMidY) * pitchSensitivity;
  
-	std::cout << "Mid window values: " << windowMidX << "\t" << windowMidY << std::endl;
+	/*std::cout << "Mid window values: " << windowMidX << "\t" << windowMidY << std::endl;
 	std::cout << "Mouse values     : " << mouseX << "\t" << mouseY << std::endl;
-	std::cout << horizMovement << "\t" << vertMovement << std::endl << std::endl;
+	std::cout << horizMovement << "\t" << vertMovement << std::endl << std::endl;*/
  
 	// Apply the mouse movement to our rotation vector. The vertical (look up and down)
 	// movement is applied on the X axis, and the horizontal (look left and right)
