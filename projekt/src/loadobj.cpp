@@ -969,7 +969,7 @@ Model* LoadModelPlus(char* name,
 		glGenBuffers(1, &m->tb);
 
 	glBindVertexArray(m->vao);
-	/*
+	
 	// VBO for vertex data
 	glBindBuffer(GL_ARRAY_BUFFER, m->vb);
 	glBufferData(GL_ARRAY_BUFFER, m->numVertices*3*sizeof(GLfloat), m->vertexArray, GL_STATIC_DRAW);
@@ -994,6 +994,5 @@ Model* LoadModelPlus(char* name,
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->ib);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m->numIndices*sizeof(GLuint), m->indexArray, GL_STATIC_DRAW);
 
-	*/
 	return m;
 }
