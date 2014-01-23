@@ -7,12 +7,18 @@ layout(location = 2) in  vec2  in_texCoord;
 uniform mat4 camTrans;
 
 out VertexData {
+	vec3 pos;
+	vec3 normal;
     vec2 texCoord;
 } VertexOut;
 
 void main(void)
 {
-	VertexOut.texCoord = in_texCoord;
+	vec4 pos = camTrans * vec4(in_Position,1.0f);
 
-    gl_Position = camTrans * vec4(in_Position,1.0f);
+	VertexOut.texCoord = in_texCoord;
+	VertexOut.normal = in_Normal;
+    VertexOut.pos = pos.xyz;
+
+    gl_Position = pos;
 }

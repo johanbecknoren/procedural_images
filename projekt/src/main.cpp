@@ -102,7 +102,7 @@ int main(int argc, char** argv) {
 	glClearColor(real(0),real(0),real(0),real(0));
 	glfwSwapInterval(0);
 	glfwSetKeyCallback((GLFWkeyfun)key_callback);
-	glfwSetMousePosCallback((GLFWmouseposfun)handle_mouse_move);
+	//glfwSetMousePosCallback((GLFWmouseposfun)handle_mouse_move);
 	real* pixels = new real[3*kWidth*kHeight]();
 
 	for(size_t i=0; i< 3*kWidth*kHeight; i += 3) {
@@ -128,10 +128,11 @@ int main(int argc, char** argv) {
 	box = LoadModelPlus(const_cast<char*>(fixPath("cube.obj").c_str()), 
 		shaderManager.getId(ShaderManager::MAIN), 
 		"in_Position", "in_Normal", "in_texCoord");
+	printError("Load models 1");
 	quad = LoadModelPlus(const_cast<char*>(fixPath("quad.obj").c_str()),
 		shaderManager.getId(ShaderManager::TEX2SCREEN),
 		"in_Position", "in_Normal", "in_texCoord");
-	printError("Load models");
+	printError("Load models 2");
 
 	glEnable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
@@ -156,19 +157,19 @@ int main(int argc, char** argv) {
 		//glDrawPixels(kWidth, kHeight, GL_RGB, GL_FLOAT, pixels);
 		
 		// TEMP RENDER STUFF
-			//Fbo::useFbo(fbo1, 0L, 0L);
-			//glm::mat4 mvp = cam.getProjection() * cam.getModelView();
-			//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			//glClearColor(0.f, 0.f, 0.f, 0.f);
-			//glUseProgram(shaderManager.getId(ShaderManager::shaderId::MAIN));
-			//glUniformMatrix4fv(
-			//	glGetUniformLocation(shaderManager.getId(ShaderManager::shaderId::MAIN), "camTrans"), 
-			//	1, GL_FALSE, glm::value_ptr(mvp) );
-			//DrawModel(box);
-			//printError("Draw box");
-			////glFlush();
+			Fbo::useFbo(fbo1, 0L, 0L);
+			glm::mat4 mvp = cam.getProjection() * cam.getModelView();
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glClearColor(0.f, 0.f, 0.f, 0.f);
+			glUseProgram(shaderManager.getId(ShaderManager::shaderId::MAIN));
+			glUniformMatrix4fv(
+				glGetUniformLocation(shaderManager.getId(ShaderManager::shaderId::MAIN), "camTrans"), 
+				1, GL_FALSE, glm::value_ptr(mvp) );
+			DrawModel(box);
+			printError("Draw box");
+			glFlush();
 
-			////Fbo::useFbo(0L,fbo1, 0L);
+			Fbo::useFbo(0L,fbo1, 0L);
 			//Fbo::useFbo(0L,0L,0L);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glClearColor(0.f, 0.f, 0.f, 0.f);

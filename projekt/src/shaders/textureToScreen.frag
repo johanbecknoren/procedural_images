@@ -11,7 +11,7 @@ out vec4 out_Color;
 
 void main(void)
 {
-	//vec4 zval = texture(texUnit, FragIn.texCoord);
-	//out_Color = vec4(zval.r, zval.g, zval.b, 1.f);
-	out_Color = vec4(1.f);
+	vec4 texval = texture(texUnit, FragIn.texCoord);
+	out_Color = vec4(texval.rgb, 1.f);
+	//out_Color = vec4(0.8f);
 }
