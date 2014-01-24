@@ -7,7 +7,7 @@
 #include "utils.h"
 #include "cam.h"
 #include "fbo.h"
-//#include "model.h"
+#include "terrain.h"
 #include "loadobj.h"
 #include "shadermanager.h"
 
@@ -24,6 +24,8 @@ Model* box;
 Model* quad;
 
 ShaderManager shaderManager;
+
+Terrain terrain;
 
 void printError(const char *functionName)
 {
@@ -104,43 +106,11 @@ int main(int argc, char** argv) {
 	glfwSwapInterval(0);
 	glfwSetKeyCallback((GLFWkeyfun)key_callback);
 	glfwSetMousePosCallback((GLFWmouseposfun)handle_mouse_move);
-	real* pixels = new real[3*kWidth*kHeight]();
-
-	for(size_t i=0; i< 3*kWidth*kHeight; i += 3) {
-		pixels[i + 0] = real(0.5);
-		pixels[i + 1] = real(0.5);
-		pixels[i + 2] = real(1.0);
-	}
 
 	float currentTime, lastTime = 0.0f;
 	float deltaT = 0.01f;
 
-	// TEMP GL-STUFF TO TEST CAMERA CLASS!
-	// This stuff maybe in terrain->init() instead.
-	fbo1 = new Fbo(kWidth, kHeight, 0);
-	printError("Error init fbo1");
-	fbo2 = new Fbo(kWidth, kHeight, 0);
-	printError("Error init fbo2");
-
-	shaderManager = ShaderManager();
-	loadShaders();
-	printError("Load shaders");
-
-	box = LoadModelPlus(const_cast<char*>(fixPath("cube.obj").c_str()), 
-		shaderManager.getId(ShaderManager::MAIN), 
-		"in_Position", "in_Normal", "in_texCoord");
-	printError("Load models 1");
-	quad = LoadModelPlus(const_cast<char*>(fixPath("quad.obj").c_str()),
-		shaderManager.getId(ShaderManager::TEX2SCREEN),
-		"in_Position", "in_Normal", "in_texCoord");
-	printError("Load models 2");
-
-	glEnable(GL_BLEND);
-	glDisable(GL_DEPTH_TEST);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	// -- END
+	terrain.init();
 
 	bool quit = false;
 	while(!quit) {
@@ -152,43 +122,9 @@ int main(int argc, char** argv) {
 		cam.move(deltaT);
 		printError("Error moving camera");
 
-
-		// Render stuff here!
-		// E.g terrain.render(cam.getModelView(), cam.getProjection());
-		//glDrawPixels(kWidth, kHeight, GL_RGB, GL_FLOAT, pixels);
-		
-		// TEMP RENDER STUFF
-			Fbo::useFbo(fbo1, 0L, 0L);
-			glm::mat4 mvp = cam.getProjection() * cam.getModelView(); // Denna borde vara korrekt
-			//glm::mat4 mvp = cam.getModelView() * cam.getProjection(); // Denna borde vara INKORREKT
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glClearColor(0.f, 0.f, 0.f, 0.f);
-			glUseProgram(shaderManager.getId(ShaderManager::shaderId::MAIN));
-			glUniformMatrix4fv(
-				glGetUniformLocation(shaderManager.getId(ShaderManager::shaderId::MAIN), "camTrans"), 
-				1, GL_FALSE, glm::value_ptr(mvp) );
-			DrawModel(box);
-			printError("Draw box");
-			glFlush();
-
-			Fbo::useFbo(0L,fbo1, 0L);
-			//Fbo::useFbo(0L,0L,0L);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glClearColor(0.f, 0.f, 0.f, 0.f);
-			glUseProgram(shaderManager.getId(ShaderManager::shaderId::TEX2SCREEN));
-			glUniform1i(
-				glGetUniformLocation(shaderManager.getId(ShaderManager::shaderId::TEX2SCREEN), "texUnit"), 
-				0);
-			DrawModel(quad);
-			printError("Draw viewport quad");
-			glFlush();
-
-			/*Fbo::useFbo(0L,0L,0L);
-			glUseProgram(0);*/
-		// -- END
+		terrain.render(cam.getModelView(), cam.getProjection());
 
 		// Swap buffers
-		//glfwPollEvents();
 		glfwSwapBuffers();
 		printError("Swap buffers");
 		if(glfwGetKey('Q') || !glfwGetWindowParam(GLFW_OPENED) ) {
