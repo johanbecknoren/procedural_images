@@ -18,6 +18,35 @@ out TCSData {
 	vec3 normal_tes[];
 } TCSOut;
 
-void main(void) {
+float GetTessLevel(float Distance0, float Distance1)
+{
+    float AvgDistance = (Distance0 + Distance1) / 2.0;
 
+    if (AvgDistance <= 2.0) {
+        return 10.0;
+    }
+    else if (AvgDistance <= 5.0) {
+        return 7.0;
+    }
+    else {
+        return 3.0;
+    }
+}
+
+void main(void) {
+	// Set control points for output patch
+	TCSOut.tex_coord_tes[gl_InvocationID] = TCSIn.tex_coord_tcs[gl_InvocationID];
+	TCSOut.normal_tes[gl_InvocationID] = TCSIn.normal_tcs[gl_InvocationID];
+	TCSOut.world_pos_tes[gl_InvocationID] = TCSIn.world_pos_tcs[gl_InvocationID];
+
+	// Distance from camera to each control point (vertex)
+	float eyeToVert0 = distance(eyeWorldPos, TCSOut.world_pos_tes[0]);
+	float eyeToVert1 = distance(eyeWorldPos, TCSOut.world_pos_tes[1]);
+	float eyeToVert2 = distance(eyeWorldPos, TCSOut.world_pos_tes[2]);
+
+	// Decide tessellation levels
+	gl_TessLevelOuter[0] = GetTessLevel(eyeToVert1, eyeToVert2);
+	gl_TessLevelOuter[1] = GetTessLevel(eyeToVert2, eyeToVert0);
+	gl_TessLevelOuter[2] = GetTessLevel(eyeToVert0, eyeToVert1);
+	gl_TessLevelInner[0] = gl_TessLevelOuter[2];
 }

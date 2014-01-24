@@ -1,0 +1,31 @@
+#version 410 core
+
+layout (triangles, equal_spacing, ccw) in;
+
+uniform mat4 MVP;
+uniform sampler2D tex_height_map;
+uniform float displacement_factor;
+
+in TCSOut {
+	vec3 world_pos_tes[];
+	vec2 tex_coord_tes[];
+	vec3 normal_tes[];
+} TCSData;
+
+out TESOut {
+	vec3 world_pos_frag;
+	vec2 tex_coord_frag;
+	vec3 normal_frag;
+} TESData;
+
+void main(void) {
+	TESData.tex_coord_frag = interpolate2D(TCSData.tex_coord_tes[0], TCSData.tex_coord_tes[1], TCSData.tex_coord_tes[2]);
+	TESData.normal_frag = interpolate3D(TCSData.normal_tes[0], TCSData.normal_tes[1], TCSData.normal_tes[2]);
+	TESData.normal_frag = normalize(TESData.normal_frag);
+	TESData.world_pos_frag = interpolate3D(TCSData.world_pos_tes[0], TCSData.world_pos_tes[1], TCSData.world_pos_tes[2]);
+
+	// Displace vertex along normal direction according to height map sample
+	float displacement = texture(tex_height_map, TESData.tex_coord_frag.xy).x;
+	TESData.world_pos_frag += TESData.normal_frag * displacement_factor * displacement;
+	gl_Position = MVP * vec4(TESData.world_pos_frag, 1.0f);
+}
