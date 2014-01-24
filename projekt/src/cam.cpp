@@ -121,10 +121,11 @@ void Camera::handleMouseMove(int mouseX, int mouseY)
 #include <glm/gtc/matrix_transform.hpp>
 glm::mat4 Camera::getModelView() {
 	glm::mat4 view;
+	
 	view = glm::rotate(view, rotation.x, glm::vec3(1.f, 0.f, 0.f));
 	view = glm::rotate(view, rotation.y, glm::vec3(0.f, 1.f, 0.f));
-	//view = glm::rotate(view, rotation.z, glm::vec3(0.f, 0.f, 1.f));
 	view = glm::translate(view, -position);
+	
 	/*view = glm::rotate(view, rotation.x, glm::vec3(1.f, 0.f, 0.f));
 	view = glm::rotate(view, rotation.y, glm::vec3(0.f, 1.f, 0.f));
 	view = glm::translate(view, -position);*/
@@ -141,8 +142,8 @@ void Camera::move(float deltaTime)
 	float sinXRot = sin( toRads( rotation.x ) );
 	float cosXRot = cos( toRads( rotation.x ) );
  
-	float sinYRot = sin( toRads( rotation.x ) );
-	float cosYRot = cos( toRads( rotation.x ) );
+	float sinYRot = sin( toRads( rotation.y ) );
+	float cosYRot = cos( toRads( rotation.y ) );
  
 	float pitchLimitFactor = cosXRot; // This cancels out moving on the Z axis when we're looking up or down
  
