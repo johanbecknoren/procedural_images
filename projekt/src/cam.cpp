@@ -11,7 +11,7 @@ Camera::Camera(int theWindowWidth, int theWindowHeight)
 {
 	initCamera();
 
-	speedFactor = 0.3f;
+	speedFactor = 0.1f;
  
 	windowWidth  = theWindowWidth;
 	windowHeight = theWindowHeight;
@@ -62,8 +62,8 @@ const float Camera::toRads(const float &theAngleInDegrees) const
 void Camera::handleMouseMove(int mouseX, int mouseY)
 {
 	// Calculate our horizontal and vertical mouse movement from middle of the window
-	float horizMovement = (mouseX - windowMidX+1) * yawSensitivity;
-	float vertMovement  = (mouseY - windowMidY) * pitchSensitivity;
+	float horizMovement = float(mouseX - windowMidX+1) * yawSensitivity;
+	float vertMovement  = float(mouseY - windowMidY) * pitchSensitivity;
  
 	/*std::cout << "Mid window values: " << windowMidX << "\t" << windowMidY << std::endl;
 	std::cout << "Mouse values     : " << mouseX << "\t" << mouseY << std::endl;

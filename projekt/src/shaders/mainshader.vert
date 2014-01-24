@@ -18,7 +18,7 @@ void main(void)
 
 	VertexOut.texCoord = in_texCoord;
 	VertexOut.normal = in_Normal;
-    VertexOut.pos = pos.xyz;
+    VertexOut.pos = in_Position;
 
     gl_Position = pos;
 }

@@ -44,7 +44,7 @@ static void key_callback(int key, int action ,int mods) {
 	std::cout<<"key="<<key<<std::endl;
 	if(key == 'O') {
 		if(action == GLFW_PRESS) {
-			//loadShaders();
+			loadShaders();
 		}
 	}
 	if (key == 'W') {// W
@@ -74,8 +74,9 @@ static void key_callback(int key, int action ,int mods) {
 	}
 }
 
-static void handle_mouse_move(double mouse_x, double mouse_y) {
-	//std::cout<<"mouse_x:"<<mouse_x<<",mouse_y:"<<mouse_y<<std::endl;
+//static void handle_mouse_move(double mouse_x, double mouse_y) {
+static void handle_mouse_move(int mouse_x, int mouse_y) {
+	std::cout<<"mouse_x:"<<mouse_x<<",mouse_y:"<<mouse_y<<std::endl;
 	cam.handleMouseMove(mouse_x, mouse_y);
 }
 
@@ -102,7 +103,7 @@ int main(int argc, char** argv) {
 	glClearColor(real(0),real(0),real(0),real(0));
 	glfwSwapInterval(0);
 	glfwSetKeyCallback((GLFWkeyfun)key_callback);
-	//glfwSetMousePosCallback((GLFWmouseposfun)handle_mouse_move);
+	glfwSetMousePosCallback((GLFWmouseposfun)handle_mouse_move);
 	real* pixels = new real[3*kWidth*kHeight]();
 
 	for(size_t i=0; i< 3*kWidth*kHeight; i += 3) {
