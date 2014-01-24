@@ -1,5 +1,5 @@
-#include "terrain.h"
 #include "gl/glew.h"
+#include "terrain.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -23,10 +23,18 @@ void initGL() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
+
+	GLint maxPatchVerts = 0;
+	glGetIntegerv(GL_MAX_PATCH_VERTICES, &maxPatchVerts);
+	std::cout << "Max supported patch vertices: "<<maxPatchVerts<<std::endl;
 }
 
 Terrain::Terrain() {
 
+}
+
+void Terrain::reloadShaders() {
+	loadShaders();
 }
 
 void Terrain::init() {
@@ -39,13 +47,16 @@ void Terrain::init() {
 	printError("Error init fbo2");
 
 	shaderManager = ShaderManager();
+
 	loadShaders();
+
 	printError("Load shaders");
 
 	box = LoadModelPlus(const_cast<char*>(fixPath("cube.obj").c_str()), 
 		shaderManager.getId(ShaderManager::MAIN), 
 		"in_Position", "in_Normal", "in_texCoord");
 	printError("Load models 1");
+
 	quad = LoadModelPlus(const_cast<char*>(fixPath("quad.obj").c_str()),
 		shaderManager.getId(ShaderManager::TEX2SCREEN),
 		"in_Position", "in_Normal", "in_texCoord");
@@ -55,8 +66,6 @@ void Terrain::init() {
 void Terrain::render(const glm::mat4 &MV, const glm::mat4 &proj) {
 	glm::mat4 mvp = proj * MV;
 	Fbo::useFbo(fbo1, 0L, 0L);
-	//glm::mat4 mvp = cam.getProjection() * cam.getModelView(); // Denna borde vara korrekt
-	//glm::mat4 mvp = cam.getModelView() * cam.getProjection(); // Denna borde vara INKORREKT
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.f, 0.f, 0.f, 0.f);
 	glUseProgram(shaderManager.getId(ShaderManager::shaderId::MAIN));
@@ -78,4 +87,13 @@ void Terrain::render(const glm::mat4 &MV, const glm::mat4 &proj) {
 	DrawModel(quad);
 	printError("Draw viewport quad");
 	glFlush();
+}
+
+void Terrain::renderPatches(const Camera& cam) {
+	// --- Create quad here, eval. and try tessellation shader here.
+
+	// Setup stuff
+	GLint maxPatchVerts = 0;
+	glGetIntegerv(GL_MAX_PATCH_VERTICES, &maxPatchVerts);
+	std::cout << "Max supported patch vertices: "<<maxPatchVerts<<std::endl;
 }

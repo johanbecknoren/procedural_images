@@ -5,6 +5,7 @@
 #include "fbo.h"
 #include "loadobj.h"
 #include "shadermanager.h"
+#include "cam.h"
 
 class Terrain {
 public:
@@ -13,6 +14,10 @@ public:
 
 	void init();
 	void render(const glm::mat4 &MV, const glm::mat4 &proj);
+	void renderPatches(const Camera& cam);
+	void reloadShaders();
+
+private:
 	void loadShaders();
 	void printError(const char *functionName);
 

@@ -73,6 +73,53 @@ void ShaderManager::printProgramInfoLog(GLuint obj, const char *vfn, const char 
 	}
 }
 
+// Compile tessellation shaders, return reference to it
+GLuint ShaderManager::compileShaders(const char *vs, const char *fs, 
+									 const char *tcs, const char *tes,
+									 const char *gs, const char *vfn, const char *ffn, 
+									 const char *tcfn, const char *tefn, const char *gfn) {
+	GLuint v,f,tc,te,g,p;
+	p = 0;
+
+	v = glCreateShader(GL_VERTEX_SHADER);
+	f = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(v, 1, &vs, NULL);
+	glShaderSource(f, 1, &fs, NULL);
+	glCompileShader(v);
+	glCompileShader(f);
+
+	if(tcs != NULL && tes != NULL) {
+		tc = glCreateShader(GL_TESS_CONTROL_SHADER);
+		glShaderSource(tc, 1, &tcs, NULL);
+		glCompileShader(tc);
+
+		te = glCreateShader(GL_TESS_EVALUATION_SHADER);
+		glShaderSource(te, 1, &tes, NULL);
+		glCompileShader(te);
+	}
+	if (gs != NULL)
+	{
+		g = glCreateShader(GL_GEOMETRY_SHADER);
+		glShaderSource(g, 1, &gs, NULL);
+		glCompileShader(g);
+	}
+
+	p = glCreateProgram();
+	glAttachShader(p,v);
+	glAttachShader(p,f);
+	if (gs != NULL)
+		glAttachShader(p,g);
+	glLinkProgram(p);
+	glUseProgram(p);
+
+	printShaderInfoLog(v, vfn);
+	printShaderInfoLog(f, ffn);
+	if (gs != NULL)	printShaderInfoLog(g, gfn);
+
+	printProgramInfoLog(p, vfn, ffn, gfn);
+
+	return p;
+}
 // Compile a shader, return reference to it
 GLuint ShaderManager::compileShaders(const char *vs, const char *fs, const char *gs, const char *vfn, const char *ffn, const char *gfn)
 {
@@ -129,9 +176,21 @@ std::string ShaderManager::fixPath(std::string localPath) {
 bool ShaderManager::loadShadersG(std::string vertFileName, std::string fragFileName, 
 								 std::string geomFileName, shaderId id)
 {
-	
 	GLuint sid = loadShaderG(fixPath(vertFileName).c_str(), 
 		fixPath(fragFileName).c_str(), fixPath(geomFileName).c_str());
+
+	shaders[id] = sid;
+	return true;
+}
+
+bool ShaderManager::loadShadersTG(std::string vertFileName, std::string fragFileName,
+								  std::string tcsFileName, std::string tesFileName,
+								  std::string geomFileName, shaderId id)
+{
+	GLuint sid = loadShaderTG(fixPath(vertFileName).c_str(), fixPath(fragFileName).c_str(), 
+		fixPath(tcsFileName).c_str(), fixPath(tesFileName).c_str(),
+		fixPath(geomFileName).c_str());
+
 	shaders[id] = sid;
 	return true;
 }
@@ -162,6 +221,52 @@ GLuint ShaderManager::loadShaderG(const char *vertFileName, const char *fragFile
 		p = compileShaders(vs, fs, gs, vertFileName, fragFileName, geomFileName);
 	if (vs != NULL) free(vs);
 	if (fs != NULL) free(fs);
+	if (gs != NULL) free(gs);
+	printf("Shader loaded with id %i \n", p);
+	glUseProgram(0);
+	return p;
+}
+
+GLuint ShaderManager::loadShaderTG(const char *vertFileName, const char *fragFileName, 
+								   const char *tcsFileName, const char *tesFileName, 
+								   const char *geomFileName)
+	// With geometry shader support
+{
+	char *vs, *fs, *tcs, *tes, *gs;
+	GLuint p = 0;
+	vs = readFile((char *)vertFileName);
+	fs = readFile((char *)fragFileName);
+
+	if(tcsFileName != NULL && tesFileName != NULL){
+		tcs = readFile((char*)tcsFileName);
+		tes = readFile((char*)tesFileName);
+	}
+	else {
+		tcs = NULL;
+		tes = NULL;
+	}
+	if(geomFileName != NULL)
+		gs = readFile((char *)geomFileName);
+	else
+		gs = NULL;
+	if (vs==NULL)
+		printf("Failed to read %s from disk.\n", vertFileName);
+	if (fs==NULL)
+		printf("Failed to read %s from disk.\n", fragFileName);
+	if(tcs == NULL && tcsFileName != NULL)
+		printf("Failed to read %s from disk.\n", tcsFileName);
+	if(tes == NULL && tesFileName != NULL)
+		printf("Failed to read %s from disk.\n", tesFileName);
+	if ((gs==NULL) && (geomFileName != NULL))
+		printf("Failed to read %s from disk.\n", geomFileName);
+	if((vs!=NULL)&&(fs!=NULL)&&(tcs!=NULL)&&(tes!=NULL))
+		p = compileShaders(vs,fs,tcs,tes,gs,vertFileName,fragFileName,tcsFileName,tesFileName,geomFileName);
+	else if ((vs!=NULL)&&(fs!=NULL))
+		p = compileShaders(vs, fs, gs, vertFileName, fragFileName, geomFileName);
+	if (vs != NULL) free(vs);
+	if (fs != NULL) free(fs);
+	if (tcs != NULL) free(tcs);
+	if (tes != NULL) free(tes);
 	if (gs != NULL) free(gs);
 	printf("Shader loaded with id %i \n", p);
 	glUseProgram(0);

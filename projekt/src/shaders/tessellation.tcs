@@ -1,0 +1,23 @@
+#version 410 core
+
+//define num of CPs in output patch
+layout(vertices = 3) out;
+
+// Used to calc TS (tessellation level)
+uniform vec3 eyeWorldPos;
+
+in VertexData {
+	vec3 world_pos_tcs[];
+	vec2 tex_coord_tcs[];
+	vec3 normal_tcs[];
+} TCSIn;
+
+out TCSData {
+	vec3 world_pos_tes[];
+	vec2 tex_coord_tes[];
+	vec3 normal_tes[];
+} TCSOut;
+
+void main(void) {
+
+}

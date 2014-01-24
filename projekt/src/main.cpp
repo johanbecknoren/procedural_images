@@ -16,14 +16,14 @@ Camera cam(kWidth, kHeight);
 //GLfloat verts[9] = {0.0f,0.0f,0.0f, 0.0f,1.0f,0.0f, 1.0f,1.0f,0.0f};
 //GLfloat normal[3] = {0.0f,0.0f,-1.0f};
 //GLfloat colors[9] = {0.0f,0.0f,0.0f, 0.0f,1.0f,0.0f, 1.0f,1.0f,0.0f};
-
-Fbo* fbo1;
-Fbo* fbo2;
-
-Model* box;
-Model* quad;
-
-ShaderManager shaderManager;
+//
+//Fbo* fbo1;
+//Fbo* fbo2;
+//
+//Model* box;
+//Model* quad;
+//
+//ShaderManager shaderManager;
 
 Terrain terrain;
 
@@ -36,17 +36,12 @@ void printError(const char *functionName)
 	}
 }
 
-void loadShaders() {
-	shaderManager.loadShaders("mainshader.vert", "mainshader.frag", ShaderManager::shaderId::MAIN);
-	shaderManager.loadShaders("textureToScreen.vert", "textureToScreen.frag", ShaderManager::TEX2SCREEN);
-}
-
 // Callback functions for GLFW window context
 static void key_callback(int key, int action ,int mods) {
 	std::cout<<"key="<<key<<std::endl;
 	if(key == 'O') {
 		if(action == GLFW_PRESS) {
-			loadShaders();
+			terrain.reloadShaders();
 		}
 	}
 	if (key == 'W') {// W
@@ -78,7 +73,7 @@ static void key_callback(int key, int action ,int mods) {
 
 //static void handle_mouse_move(double mouse_x, double mouse_y) {
 static void handle_mouse_move(int mouse_x, int mouse_y) {
-	std::cout<<"mouse_x:"<<mouse_x<<",mouse_y:"<<mouse_y<<std::endl;
+	//std::cout<<"mouse_x:"<<mouse_x<<",mouse_y:"<<mouse_y<<std::endl;
 	cam.handleMouseMove(mouse_x, mouse_y);
 }
 
