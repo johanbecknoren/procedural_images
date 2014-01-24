@@ -35,8 +35,8 @@ Camera::~Camera()
 void Camera::initCamera()
 {
 	// Set position, rotation and speed values to zero
-	position = glm::vec3(0.f, 0.f, 8.f);
-	rotation = glm::vec3(0);
+	position = glm::vec3(0.5f, 0.5f, 4.f);
+	rotation = glm::vec3(0.f);
 	speed = glm::vec3(0);
  
 	// How fast we move (higher values mean we move and strafe faster)
@@ -123,7 +123,11 @@ glm::mat4 Camera::getModelView() {
 	glm::mat4 view;
 	view = glm::rotate(view, rotation.x, glm::vec3(1.f, 0.f, 0.f));
 	view = glm::rotate(view, rotation.y, glm::vec3(0.f, 1.f, 0.f));
+	//view = glm::rotate(view, rotation.z, glm::vec3(0.f, 0.f, 1.f));
 	view = glm::translate(view, -position);
+	/*view = glm::rotate(view, rotation.x, glm::vec3(1.f, 0.f, 0.f));
+	view = glm::rotate(view, rotation.y, glm::vec3(0.f, 1.f, 0.f));
+	view = glm::translate(view, -position);*/
 	return view;
 }
 

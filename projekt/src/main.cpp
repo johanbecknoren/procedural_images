@@ -159,7 +159,8 @@ int main(int argc, char** argv) {
 		
 		// TEMP RENDER STUFF
 			Fbo::useFbo(fbo1, 0L, 0L);
-			glm::mat4 mvp = cam.getProjection() * cam.getModelView();
+			glm::mat4 mvp = cam.getProjection() * cam.getModelView(); // Denna borde vara korrekt
+			//glm::mat4 mvp = cam.getModelView() * cam.getProjection(); // Denna borde vara INKORREKT
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glClearColor(0.f, 0.f, 0.f, 0.f);
 			glUseProgram(shaderManager.getId(ShaderManager::shaderId::MAIN));
