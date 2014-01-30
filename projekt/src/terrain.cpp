@@ -72,7 +72,11 @@ void Terrain::render(const glm::mat4 &MV, const glm::mat4 &proj) {
 	glUniformMatrix4fv(
 		glGetUniformLocation(shaderManager.getId(ShaderManager::shaderId::MAIN), "camTrans"), 
 		1, GL_FALSE, glm::value_ptr(mvp) );
-	DrawModel(box);
+	if(!drawWireframe)
+		DrawModel(box);
+	else
+		DrawWireframeModel(box);
+
 	printError("Draw box");
 	glFlush();
 

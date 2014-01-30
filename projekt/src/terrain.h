@@ -17,6 +17,9 @@ public:
 	void renderPatches(const Camera& cam);
 	void reloadShaders();
 
+	bool getWireframeRender() const { return drawWireframe; }
+	void setWireRender(const bool &b) { drawWireframe = b; }
+
 private:
 	void loadShaders();
 	void printError(const char *functionName);
@@ -29,5 +32,7 @@ private:
 	Model* quad;
 
 	ShaderManager shaderManager;
+
+	bool drawWireframe;
 };
 #endif TERRAIN_H

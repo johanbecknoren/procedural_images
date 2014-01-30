@@ -944,6 +944,13 @@ void DrawModel(Model *m)
 	glDrawElements(GL_TRIANGLES, m->numIndices, GL_UNSIGNED_INT, 0L);
 }
 
+void DrawWireframeModel(Model *m) {
+	glBindVertexArray(m->vao);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m->ib);
+	glDrawElements(GL_LINE_LOOP, m->numIndices, GL_UNSIGNED_INT, 0L);
+}
+
 
 std::string fixPath(std::string localPath) {
 	std::stringstream fullPath(CMAKE_PROJECT_ROOT_DIR);

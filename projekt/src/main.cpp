@@ -44,6 +44,11 @@ static void key_callback(int key, int action ,int mods) {
 			terrain.reloadShaders();
 		}
 	}
+	if(key == 'V') {
+		if(action == GLFW_PRESS) {
+			terrain.setWireRender(!terrain.getWireframeRender());
+		}
+	}
 	if (key == 'W') {// W
 		if(action == GLFW_PRESS) {
 			cam.holdingForward = true;
