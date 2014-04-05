@@ -7,9 +7,9 @@ layout(vertices = 3) out;
 uniform vec3 eyeWorldPos;
 
 in VertexData {
-	vec3 world_pos_tcs[];
-	vec2 tex_coord_tcs[];
-	vec3 normal_tcs[];
+	vec3 world_pos_tcs;
+	vec2 tex_coord_tcs;
+	vec3 normal_tcs;
 } TCSIn;
 
 out TCSData {
@@ -20,6 +20,8 @@ out TCSData {
 
 float GetTessLevel(float Distance0, float Distance1)
 {
+	return 7.0f; // for debugging
+
     float AvgDistance = (Distance0 + Distance1) / 2.0;
 
     if (AvgDistance <= 2.0) {

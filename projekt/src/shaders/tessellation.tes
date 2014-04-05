@@ -2,7 +2,7 @@
 
 layout (triangles, equal_spacing, ccw) in;
 
-uniform mat4 MVP;
+uniform mat4 camTrans;
 uniform sampler2D tex_height_map;
 uniform float displacement_factor;
 
@@ -35,7 +35,7 @@ void main(void) {
 	TESData.world_pos_frag = interpolate3D(TCSData.world_pos_tes[0], TCSData.world_pos_tes[1], TCSData.world_pos_tes[2]);
 
 	// Displace vertex along normal direction according to height map sample
-	float displacement = texture(tex_height_map, TESData.tex_coord_frag.xy).x;
-	TESData.world_pos_frag += TESData.normal_frag * displacement_factor * displacement;
-	gl_Position = MVP * vec4(TESData.world_pos_frag, 1.0f);
+	float displacement = 1.f;//texture(tex_height_map, TESData.tex_coord_frag.xy).x;
+	TESData.world_pos_frag += 0.f;//TESData.normal_frag * displacement_factor * displacement;
+	gl_Position = camTrans * vec4(TESData.world_pos_frag, 1.0f);
 }

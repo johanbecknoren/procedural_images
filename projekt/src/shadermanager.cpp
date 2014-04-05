@@ -81,6 +81,8 @@ GLuint ShaderManager::compileShaders(const char *vs, const char *fs,
 	GLuint v,f,tc,te,g,p;
 	p = 0;
 
+	//printf(fs);
+
 	v = glCreateShader(GL_VERTEX_SHADER);
 	f = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(v, 1, &vs, NULL);

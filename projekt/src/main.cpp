@@ -38,7 +38,7 @@ void printError(const char *functionName)
 
 // Callback functions for GLFW window context
 static void key_callback(int key, int action ,int mods) {
-	std::cout<<"key="<<key<<std::endl;
+	//std::cout<<"key="<<key<<std::endl;
 	if(key == 'O') {
 		if(action == GLFW_PRESS) {
 			terrain.reloadShaders();
