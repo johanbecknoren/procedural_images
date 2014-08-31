@@ -76,10 +76,24 @@ static void key_callback(int key, int action ,int mods) {
 	}
 }
 
-//static void handle_mouse_move(double mouse_x, double mouse_y) {
 static void handle_mouse_move(int mouse_x, int mouse_y) {
 	//std::cout<<"mouse_x:"<<mouse_x<<",mouse_y:"<<mouse_y<<std::endl;
 	cam.handleMouseMove(mouse_x, mouse_y);
+}
+
+static void handle_mouse_button(int button, int action, int mods) {
+	//std::cout << "Button: " << button << std::endl;
+	if(button == 0) { // LMB
+		if(action == GLFW_PRESS)
+			cam.holdingLMB = true;
+		else if(action == GLFW_RELEASE)
+			cam.holdingLMB = false;
+	} else if (button == 1) { // RMB
+		if(action == GLFW_PRESS)
+			cam.holdingRMB = true;
+		else if(action == GLFW_RELEASE)
+			cam.holdingRMB = false;
+	}
 }
 
 int main(int argc, char** argv) {
@@ -106,6 +120,7 @@ int main(int argc, char** argv) {
 	glfwSwapInterval(0);
 	glfwSetKeyCallback((GLFWkeyfun)key_callback);
 	glfwSetMousePosCallback((GLFWmouseposfun)handle_mouse_move);
+	glfwSetMouseButtonCallback((GLFWmousebuttonfun)handle_mouse_button);
 
 	float currentTime, lastTime = 0.0f;
 	float deltaT = 0.01f;

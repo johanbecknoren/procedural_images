@@ -36,7 +36,7 @@ void Camera::initCamera()
 {
 	// Set position, rotation and speed values to zero
 	position = glm::vec3(0.5f, 0.5f, 4.f);
-	rotation = glm::vec3(0.f);
+	rotation = glm::vec3(0.1f);
 	speed = glm::vec3(0);
  
 	// How fast we move (higher values mean we move and strafe faster)
@@ -171,6 +171,16 @@ void Camera::move(float deltaTime)
 	{
 		movement.x +=(cosYRot);
 		movement.z +=(sinYRot);
+	}
+
+	if(holdingLMB)
+	{
+		movement.y += glm::abs(sinXRot);
+	}
+
+	if(holdingRMB)
+	{
+		movement.y -= glm::abs(sinXRot);
 	}
  
 	// Normalise our movement vector

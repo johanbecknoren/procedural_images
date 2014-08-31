@@ -47,6 +47,8 @@ class Camera
         bool holdingBackward;
         bool holdingLeftStrafe;
         bool holdingRightStrafe;
+		bool holdingLMB;
+		bool holdingRMB;
  
         // Constructors
         Camera(int windowWidth, int windowHeight);

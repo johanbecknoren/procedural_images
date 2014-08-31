@@ -13,8 +13,8 @@ void Terrain::printError(const char *functionName)
 }
 
 void Terrain::loadShaders() {
-	//shaderManager.loadShaders("mainshader.vert", "mainshader.frag", ShaderManager::shaderId::MAIN);
-	shaderManager.loadShadersTG("tessellation.vert", "tessellation.frag", "tessellation.tcs", "tessellation.tes", "", ShaderManager::shaderId::MAIN);
+	shaderManager.loadShaders("mainshader.vert", "mainshader.frag", ShaderManager::shaderId::MAIN);
+	//shaderManager.loadShadersTG("tessellation.vert", "tessellation.frag", "tessellation.tcs", "tessellation.tes", "", ShaderManager::shaderId::MAIN);
 	shaderManager.loadShaders("textureToScreen.vert", "textureToScreen.frag", ShaderManager::TEX2SCREEN);
 }
 
