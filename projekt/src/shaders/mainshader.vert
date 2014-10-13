@@ -5,6 +5,8 @@ layout(location = 1) in  vec3  in_Normal;
 layout(location = 2) in  vec2  in_texCoord;
 
 uniform mat4 camTrans;
+uniform unsigned int gridWidth;
+uniform unsigned int gridHeight;
 
 out VertexData {
 	vec3 pos;
@@ -18,7 +20,6 @@ void main(void)
 
 	VertexOut.texCoord = in_texCoord;
 	VertexOut.normal = in_Normal;
-	//VertexOut.normal = camTrans * vec4(in_Normal,1.0f);
     VertexOut.pos = in_Position;
 
     gl_Position = pos;

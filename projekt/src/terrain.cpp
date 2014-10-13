@@ -3,6 +3,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#define RENDER_GRID
+
 void Terrain::printError(const char *functionName)
 {
 	GLenum error;
@@ -22,8 +24,8 @@ void initGL() {
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
 
 	GLint maxPatchVerts = 0;
 	glGetIntegerv(GL_MAX_PATCH_VERTICES, &maxPatchVerts);
@@ -53,6 +55,7 @@ void Terrain::init() {
 
 	printError("Load shaders");
 
+#ifndef RENDER_GRID
 	box = LoadModelPlus(const_cast<char*>(fixPath("cube.obj").c_str()), 
 		shaderManager.getId(ShaderManager::MAIN), 
 		"in_Position", "in_Normal", "in_texCoord");
@@ -62,17 +65,95 @@ void Terrain::init() {
 		shaderManager.getId(ShaderManager::TEX2SCREEN),
 		"in_Position", "in_Normal", "in_texCoord");
 	printError("Load models 2");
+#else
+	generateGrid();
+	printError("generateGrid()");
+#endif
+}
+
+void indexTo2D(const uint32_t i, uint32_t &col, uint32_t &row)
+{
+	col = i/kGridWidth;
+	row = i%kGridHeight;
+}
+
+bool Terrain::generateGrid()
+{
+	unsigned int numVertices = getVertexCount();
+	unsigned int numIndices = getIndexCount();
+
+	// Allocate arrays
+	_vertices = new GLfloat[numVertices];
+	_vertexIndices = new GLuint[numIndices];
+
+	unsigned int i = 0;
+
+	for(unsigned int row=0; row<kGridHeight; ++row)
+	{
+		for(unsigned int col=0; col<kGridWidth; ++col)
+		{
+			_vertices[i++] = static_cast<GLfloat>(row);
+			_vertices[i++] = -10.0f;
+			_vertices[i++] = static_cast<GLfloat>(col);
+		}
+	}
+
+	i = 0;
+
+	for (unsigned int row=0; row<kGridHeight-1; row++ ) 
+	{
+        if ((row&1)==0) 
+		{ // even rows
+            for ( int col=0; col<kGridWidth; col++ ) 
+			{
+                _vertexIndices[i++] = col + row * kGridWidth;
+                _vertexIndices[i++] = col + (row+1) * kGridWidth;
+            }
+        }
+		else 
+		{ // odd rows
+            for (unsigned int col=kGridWidth-1; col>0; col-- ) 
+			{
+                _vertexIndices[i++] = col + (row+1) * kGridWidth;
+                _vertexIndices[i++] = col - 1 + + row * kGridWidth;
+            }
+        }
+    }
+
+	glGenVertexArrays(1, &_vao);
+	glGenBuffers(1, &_vb);
+	glGenBuffers(1, &_ib);
+
+	glBindVertexArray(_vao);
+	// VBO for vertex data
+	glBindBuffer(GL_ARRAY_BUFFER, _vb);
+	glBufferData(GL_ARRAY_BUFFER, getVertexCount()*sizeof(GLfloat), _vertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(
+		glGetAttribLocation(shaderManager.getId(ShaderManager::MAIN), "in_Position"), 3, GL_FLOAT, GL_FALSE,0,0);
+	glEnableVertexAttribArray(glGetAttribLocation(shaderManager.getId(ShaderManager::MAIN), "in_Position"));
+
+	/*VBO for normal data here if needed*/
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ib);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, getIndexCount()*sizeof(GLuint), _vertexIndices, GL_STATIC_DRAW);
+
+	printError("Binding buffers");
+	return true;
 }
 
 void Terrain::render(const glm::mat4 &MV, const glm::mat4 &proj) {
+
 	glm::mat4 mvp = proj * MV;
-	Fbo::useFbo(fbo1, 0L, 0L);
+	//Fbo::useFbo(fbo1, 0L, 0L); // Draw to a Frame Buffer Object
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0.f, 0.f, 0.f, 0.f);
+	glClearColor(0.5f, 0.5f, 0.5f, 0.f);
 	glUseProgram(shaderManager.getId(ShaderManager::shaderId::MAIN));
 	glUniformMatrix4fv(
 		glGetUniformLocation(shaderManager.getId(ShaderManager::shaderId::MAIN), "camTrans"), 
 		1, GL_FALSE, glm::value_ptr(mvp) );
+	glUniform1ui(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "gridWidth"),kGridWidth);
+	glUniform1ui(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "gridHeight"),kGridHeight);
+#ifndef RENDER_GRID	
 	if(!drawWireframe)
 		DrawModel(box);
 	else
@@ -81,17 +162,29 @@ void Terrain::render(const glm::mat4 &MV, const glm::mat4 &proj) {
 	printError("Draw box");
 	glFlush();
 
-	Fbo::useFbo(0L,fbo1, 0L);
-	//Fbo::useFbo(0L,0L,0L);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0.5f, 0.5f, 0.5f, 0.f);
-	glUseProgram(shaderManager.getId(ShaderManager::shaderId::TEX2SCREEN));
-	glUniform1i(
-		glGetUniformLocation(shaderManager.getId(ShaderManager::shaderId::TEX2SCREEN), "texUnit"), 
-		0);
-	DrawModel(quad);
-	printError("Draw viewport quad");
+	// Draw full screen quad
+	//Fbo::useFbo(0L,fbo1, 0L);
+	////Fbo::useFbo(0L,0L,0L);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glClearColor(0.5f, 0.5f, 0.5f, 0.f);
+	//glUseProgram(shaderManager.getId(ShaderManager::shaderId::TEX2SCREEN));
+	//glUniform1i(
+	//	glGetUniformLocation(shaderManager.getId(ShaderManager::shaderId::TEX2SCREEN), "texUnit"), 
+	//	0);
+	//DrawModel(quad);
+	//printError("Draw viewport quad");
+	//glFlush();
+#else
+	printError("mvp");
+	glBindVertexArray(_vao);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ib);
+	if(!drawWireframe)
+		glDrawElements(GL_TRIANGLE_STRIP, getIndexCount(), GL_UNSIGNED_INT, 0L);
+	else
+		glDrawElements(GL_LINE_LOOP, getIndexCount(), GL_UNSIGNED_INT, 0L);
+	printError("Terrain render");
 	glFlush();
+#endif
 }
 
 void Terrain::renderPatches(const Camera& cam) {
