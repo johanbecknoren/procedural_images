@@ -10,9 +10,9 @@
 const int kWidth = 1280;
 const int kHeight = 720;
 
-const unsigned int kGridWidth = 20;
-const unsigned int kGridHeight = 20;
-const unsigned int kGridPointSpacing = 100;
+const unsigned int kGridWidth = 400;
+const unsigned int kGridHeight = 400;
+const unsigned int kGridPointSpacing = 2;
 
 // Typedefs
 typedef float real;

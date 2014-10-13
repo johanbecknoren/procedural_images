@@ -24,8 +24,8 @@ void initGL() {
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
 
 	GLint maxPatchVerts = 0;
 	glGetIntegerv(GL_MAX_PATCH_VERTICES, &maxPatchVerts);
@@ -92,9 +92,9 @@ bool Terrain::generateGrid()
 	{
 		for(unsigned int col=0; col<kGridWidth; ++col)
 		{
-			_vertices[i++] = static_cast<GLfloat>(row);
+			_vertices[i++] = static_cast<GLfloat>(row)*kGridPointSpacing;
 			_vertices[i++] = -10.0f;
-			_vertices[i++] = static_cast<GLfloat>(col);
+			_vertices[i++] = static_cast<GLfloat>(col)*kGridPointSpacing;
 		}
 	}
 
@@ -146,7 +146,8 @@ void Terrain::render(const glm::mat4 &MV, const glm::mat4 &proj) {
 	glm::mat4 mvp = proj * MV;
 	//Fbo::useFbo(fbo1, 0L, 0L); // Draw to a Frame Buffer Object
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0.5f, 0.5f, 0.5f, 0.f);
+	//glClearColor(0.5f, 0.5f, 0.5f, 0.f);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.f);
 	glUseProgram(shaderManager.getId(ShaderManager::shaderId::MAIN));
 	glUniformMatrix4fv(
 		glGetUniformLocation(shaderManager.getId(ShaderManager::shaderId::MAIN), "camTrans"), 
