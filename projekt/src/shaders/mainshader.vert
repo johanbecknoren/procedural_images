@@ -4,16 +4,6 @@ layout(location = 0) in  vec3  in_Position;
 layout(location = 1) in  vec3  in_Normal;
 layout(location = 2) in  vec2  in_texCoord;
 
-uniform mat4 camTrans;
-uniform unsigned int gridWidth;
-uniform unsigned int gridHeight;
-
-out VertexData {
-	vec3 pos;
-	vec3 normal;
-    vec2 texCoord;
-} VertexOut;
-
 //
 // Description : Array and textureless GLSL 2D simplex noise function.
 //      Author : Ian McEwan, Ashima Arts.
@@ -88,23 +78,41 @@ float snoise(vec2 v)
 const vec2 size = vec2(2.0,0.0);
 const ivec3 off = ivec3(-1,0,1);
 
+uniform mat4 camTrans;
+uniform unsigned int gridWidth;
+uniform unsigned int gridHeight;
+
+out VertexData {
+	vec3 pos;
+	vec3 normal;
+    vec2 texCoord;
+} VertexOut;
+
+
 void main(void)
 {
 	vec3 hmNorm = in_Normal;
 	vec3 hmPos = in_Position;
+	float du = 1.f/float(gridWidth);
+	float dv = 1.f/float(gridHeight);
 	vec2 sample = vec2(hmPos.x/100, hmPos.z/100);
 	hmPos.y = snoise(sample);
 	hmPos.y *= 10;
 
-	float s11 = hmPos.x;
-    float s01 = snoise(sample+ off.xy);
-    float s21 = snoise(sample+ off.zy);
-    float s10 = snoise(sample+ off.yx);
-    float s12 = snoise(sample+ off.yz);
-	vec3 va = normalize(vec3(size.xy,s21-s01));
-    vec3 vb = normalize(vec3(size.yx,s12-s10));
-    vec4 bump = vec4( cross(va,vb), s11 );
-    hmNorm = bump.xyz;
+	float ugrad = snoise(vec2(sample.x+du, sample.y)) - snoise(vec2(sample.x-du, sample.y));
+	float vgrad = snoise(vec2(sample.x, sample.y+dv)) - snoise(vec2(sample.x, sample.y-dv));
+
+	hmNorm = vec3(-ugrad, .0, vgrad);
+
+	// float s11 = hmPos.x;
+ //    float s01 = snoise(sample+ off.xy);
+ //    float s21 = snoise(sample+ off.zy);
+ //    float s10 = snoise(sample+ off.yx);
+ //    float s12 = snoise(sample+ off.yz);
+	// vec3 va = normalize(vec3(size.xy,s21-s01));
+ //    vec3 vb = normalize(vec3(size.yx,s12-s10));
+ //    vec4 bump = vec4( cross(va,vb), s11 );
+ //    hmNorm = bump.xyz;
 	
 	vec4 pos = camTrans * vec4(hmPos, 1.0f);
 
