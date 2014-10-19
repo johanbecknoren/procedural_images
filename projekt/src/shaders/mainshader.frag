@@ -8,11 +8,11 @@ in VertexData {
 
 out vec4 out_Color;
 
-const vec3 lightDir = normalize(vec3(1.f, 1.f,0.f));
+const vec3 lightDir = normalize(vec3(1.f, 0.5f,0.f));
 
 void main(void)
 {
-	out_Color = vec4(1,0,0,1)*dot(lightDir, normalize(FragIn.normal));
+	out_Color = vec4(0,1,0,1)+vec4(1,0,0,1)*dot(-lightDir, normalize(FragIn.normal));
 	//out_Color = vec4(normalize((FragIn.normal)), 1.0f);
 	//out_Color = vec4(FragIn.normal, 1.0f);
 	//out_Color = vec4(1.0f);

@@ -10,8 +10,8 @@
 const int kWidth = 1280;
 const int kHeight = 720;
 
-const unsigned int kGridWidth = 400;
-const unsigned int kGridHeight = 400;
+const unsigned int kGridWidth = 40;
+const unsigned int kGridHeight = 40;
 const unsigned int kGridPointSpacing = 1;
 
 // Typedefs
