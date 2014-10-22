@@ -12,16 +12,16 @@ public:
 	Terrain();
 	~Terrain() {
 		delete[] _vertices;
-		delete[] _vertexnormals;
+		delete[] _vertexNormals;
 	};
 
 	void init();
-	void render(const glm::mat4 &MV, const glm::mat4 &proj);
+	void render(const glm::mat4 &MV, const glm::mat4 &proj, const glm::vec3 &campos);
 	void renderPatches(const Camera& cam);
 	void reloadShaders();
 
 	bool getWireframeRender() const { return drawWireframe; }
-	void setWireRender(const bool &b) { drawWireframe = b; }
+	void toggleWireRender() { drawWireframe = !drawWireframe; }
 
 	bool generateGrid();
 
@@ -40,9 +40,9 @@ private:
 
 	GLfloat* _vertices;
 	GLuint* _vertexIndices;
-	GLfloat* _vertexnormals;
+	GLfloat* _vertexNormals;
 
-	GLuint _vao,_vb,_ib;
+	GLuint _vao,_vb,_ib,_nb;
 
 	ShaderManager shaderManager;
 

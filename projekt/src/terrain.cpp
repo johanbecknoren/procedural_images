@@ -22,8 +22,9 @@ void Terrain::loadShaders() {
 
 void initGL() {
 	glEnable(GL_BLEND);
-	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
+	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
 
@@ -81,10 +82,12 @@ bool Terrain::generateGrid()
 {
 	unsigned int numVertices = getVertexCount();
 	unsigned int numIndices = getIndexCount();
+	unsigned int numNormals = getVertexCount();
 
 	// Allocate arrays
 	_vertices = new GLfloat[numVertices];
 	_vertexIndices = new GLuint[numIndices];
+	_vertexNormals = new GLfloat[numNormals];
 
 	unsigned int i = 0;
 
@@ -101,6 +104,7 @@ bool Terrain::generateGrid()
 	i = 0;
 
 	for (unsigned int row=0; row<kGridHeight-1; row++ ) 
+	//for (int row=kGridHeight-2; row>=0; row-- ) 
 	{
         if ((row&1)==0) 
 		{ // even rows
@@ -120,9 +124,21 @@ bool Terrain::generateGrid()
         }
     }
 
+	i = 0;
+	for(unsigned int row=0; row<kGridHeight; ++row)
+	{
+		for(unsigned int col=0; col<kGridWidth; ++col)
+		{
+			_vertexNormals[i++] = 0.f;
+			_vertexNormals[i++] = 1.f;
+			_vertexNormals[i++] = 0.f;
+		}
+	}
+
 	glGenVertexArrays(1, &_vao);
 	glGenBuffers(1, &_vb);
 	glGenBuffers(1, &_ib);
+	glGenBuffers(1, &_nb);
 
 	glBindVertexArray(_vao);
 	// VBO for vertex data
@@ -133,6 +149,11 @@ bool Terrain::generateGrid()
 	glEnableVertexAttribArray(glGetAttribLocation(shaderManager.getId(ShaderManager::MAIN), "in_Position"));
 
 	/*VBO for normal data here if needed*/
+	glBindBuffer(GL_ARRAY_BUFFER, _nb);
+	glBufferData(GL_ARRAY_BUFFER, getVertexCount()*sizeof(GLfloat), _vertexNormals, GL_STATIC_DRAW);
+	glVertexAttribPointer(
+		glGetAttribLocation(shaderManager.getId(ShaderManager::MAIN), "in_Normal"), 3, GL_FLOAT, GL_FALSE,0,0);
+	glEnableVertexAttribArray(glGetAttribLocation(shaderManager.getId(ShaderManager::MAIN), "in_Normal"));
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ib);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, getIndexCount()*sizeof(GLuint), _vertexIndices, GL_STATIC_DRAW);
@@ -141,7 +162,7 @@ bool Terrain::generateGrid()
 	return true;
 }
 
-void Terrain::render(const glm::mat4 &MV, const glm::mat4 &proj) {
+void Terrain::render(const glm::mat4 &MV, const glm::mat4 &proj, const glm::vec3 &campos) {
 
 	glm::mat4 mvp = proj * MV;
 	//Fbo::useFbo(fbo1, 0L, 0L); // Draw to a Frame Buffer Object
@@ -150,10 +171,14 @@ void Terrain::render(const glm::mat4 &MV, const glm::mat4 &proj) {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.f);
 	glUseProgram(shaderManager.getId(ShaderManager::shaderId::MAIN));
 	glUniformMatrix4fv(
-		glGetUniformLocation(shaderManager.getId(ShaderManager::shaderId::MAIN), "camTrans"), 
+		glGetUniformLocation(shaderManager.getId(ShaderManager::shaderId::MAIN), "mvp"), 
 		1, GL_FALSE, glm::value_ptr(mvp) );
+	printError("mvp");
 	glUniform1ui(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "gridWidth"),kGridWidth);
 	glUniform1ui(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "gridHeight"),kGridHeight);
+	printError("grid dimensions");
+	glUniform3fv(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "camPos"), 1, glm::value_ptr(campos));
+	printError("camera position");
 #ifndef RENDER_GRID	
 	if(!drawWireframe)
 		DrawModel(box);
@@ -176,7 +201,7 @@ void Terrain::render(const glm::mat4 &MV, const glm::mat4 &proj) {
 	//printError("Draw viewport quad");
 	//glFlush();
 #else
-	printError("mvp");
+	
 	glBindVertexArray(_vao);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ib);
 	if(!drawWireframe)

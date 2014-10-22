@@ -7,6 +7,8 @@
 #include <GL/glfw.h>     // Include OpenGL Framework library for the GLFW_PRESS constant only!
  
 #include <glm/glm.hpp>
+
+#include "utils.h"
  
 // BORROWED FROM http://r3dux.org/2012/12/a-c-camera-class-for-simple-opengl-fps-controls/
 

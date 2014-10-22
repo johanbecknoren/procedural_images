@@ -5,7 +5,6 @@
 // Borrowed from http://r3dux.org/2012/12/a-c-camera-class-for-simple-opengl-fps-controls/
 
 const float Camera::TO_RADS = 3.141592654f / 180.0f; // The value of 1 degree in radians
-const float M_PI = 3.14159f; 
 
 Camera::Camera(int theWindowWidth, int theWindowHeight)
 {
@@ -35,12 +34,12 @@ Camera::~Camera()
 void Camera::initCamera()
 {
 	// Set position, rotation and speed values to zero
-	position = glm::vec3(0.5f, 0.5f, 4.f);
-	rotation = glm::vec3(0.1f);
-	speed = glm::vec3(0);
+	position = glm::vec3(0.f, 5.f, 0.f);
+	rotation = glm::vec3(0.f, 135.f, 0.f);
+	speed = glm::vec3(0.f);
  
 	// How fast we move (higher values mean we move and strafe faster)
-	movementSpeedFactor = 100.0f;
+	movementSpeedFactor = 10.0f;
  
 	pitchSensitivity = 0.2f; // How sensitive mouse movements affect looking up and down
 	yawSensitivity   = 0.2f; // How sensitive mouse movements affect looking left and right
@@ -115,7 +114,6 @@ void Camera::handleMouseMove(int mouseX, int mouseY)
 	}
  
 	// Reset the mouse position to the centre of the window each frame
-	//glfwSetCursorPos(glfwGetWindowSize(), windowMidX, windowMidY);
 	glfwSetMousePos(windowMidX, windowMidY);
 }
 #include <glm/gtc/matrix_transform.hpp>
@@ -124,7 +122,8 @@ glm::mat4 Camera::getModelView() {
 	
 	view = glm::rotate(view, rotation.x, glm::vec3(1.f, 0.f, 0.f));
 	view = glm::rotate(view, rotation.y, glm::vec3(0.f, 1.f, 0.f));
-	view = glm::translate(view, -position);
+	//view = glm::translate(view, -position);
+	view = glm::translate(view, -1.f*glm::vec3(-10.f, 5.f, -10.f));
 	
 	/*view = glm::rotate(view, rotation.x, glm::vec3(1.f, 0.f, 0.f));
 	view = glm::rotate(view, rotation.y, glm::vec3(0.f, 1.f, 0.f));

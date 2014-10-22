@@ -46,7 +46,7 @@ static void key_callback(int key, int action ,int mods) {
 	}
 	if(key == 'V') {
 		if(action == GLFW_PRESS) {
-			terrain.setWireRender(!terrain.getWireframeRender());
+			terrain.toggleWireRender();
 		}
 	}
 	if (key == 'W') {// W
@@ -76,9 +76,14 @@ static void key_callback(int key, int action ,int mods) {
 	}
 }
 
+bool first_time;
+
 static void handle_mouse_move(int mouse_x, int mouse_y) {
 	//std::cout<<"mouse_x:"<<mouse_x<<",mouse_y:"<<mouse_y<<std::endl;
-	cam.handleMouseMove(mouse_x, mouse_y);
+	if(!first_time)
+		cam.handleMouseMove(mouse_x, mouse_y);
+	else
+		first_time = false;
 }
 
 static void handle_mouse_button(int button, int action, int mods) {
@@ -119,11 +124,13 @@ int main(int argc, char** argv) {
 	glClearColor(real(0),real(0),real(0),real(0));
 	glfwSwapInterval(0);
 	glfwSetKeyCallback((GLFWkeyfun)key_callback);
-	glfwSetMousePosCallback((GLFWmouseposfun)handle_mouse_move);
+	//glfwSetMousePosCallback((GLFWmouseposfun)handle_mouse_move);
 	glfwSetMouseButtonCallback((GLFWmousebuttonfun)handle_mouse_button);
 
 	float currentTime, lastTime = 0.0f;
 	float deltaT = 0.01f;
+
+	first_time = true;
 
 	terrain.init();
 
@@ -137,7 +144,7 @@ int main(int argc, char** argv) {
 		cam.move(deltaT);
 		printError("Error moving camera");
 
-		terrain.render(cam.getModelView(), cam.getProjection());
+		terrain.render(cam.getModelView(), cam.getProjection(), cam.getPosition());
 
 		// Swap buffers
 		glfwSwapBuffers();

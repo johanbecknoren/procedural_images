@@ -78,7 +78,8 @@ float snoise(vec2 v)
 const vec2 size = vec2(2.0,0.0);
 const ivec3 off = ivec3(-1,0,1);
 
-uniform mat4 camTrans;
+uniform mat4 mvp;
+uniform vec3 camPos;
 uniform unsigned int gridWidth;
 uniform unsigned int gridHeight;
 
@@ -86,34 +87,52 @@ out VertexData {
 	vec3 pos;
 	vec3 normal;
     vec2 texCoord;
+    vec3 viewDir;
 } VertexOut;
 
+float getGradU(vec2 samplePos, float du)
+{
+	return snoise(vec2(samplePos.x+du, samplePos.y)) - snoise(vec2(samplePos.x-du, samplePos.y));
+}
+
+float getGradV(vec2 samplePos, float dv)
+{
+	return snoise(vec2(samplePos.x, samplePos.y+dv)) - snoise(vec2(samplePos.x, samplePos.y-dv));
+}
+
+vec3 getNormalFromGrad(float ugrad, float vgrad)
+{
+	return vec3(-ugrad, 0.1, vgrad);
+}
+
+vec3 getNormalVector(vec2 samplePos, float du, float dv)
+{
+	return getNormalFromGrad(getGradU(samplePos, du), getGradV(samplePos, dv));
+}
 
 void main(void)
 {
 	vec3 hmNorm = in_Normal;
 	vec3 hmPos = in_Position;
+
 	float du = 1.f/float(gridWidth);
 	float dv = 1.f/float(gridHeight);
-	vec2 sample = vec2(hmPos.x/20, hmPos.z/20);
-	hmPos.y = snoise(sample);
-	hmPos.y *= 2;
 
-	float ugrad = snoise(vec2(sample.x+du, sample.y)) - snoise(vec2(sample.x-du, sample.y));
-	float vgrad = snoise(vec2(sample.x, sample.y+dv)) - snoise(vec2(sample.x, sample.y-dv));
+	// ToDo offset this samplepos by camera position and/or direction
+	vec2 sample = vec2(hmPos.x/20, hmPos.z/20) + camPos.xz;
+	vec2 sampleHiFreq = vec2(hmPos.x/10, hmPos.z/10) + camPos.xz;
 
-	hmNorm = vec3(-ugrad, .5, vgrad);
-	
-	vec4 pos = camTrans * vec4(hmPos, 1.0f);
+	hmPos.y = snoise(sample);//+0.5*snoise(sampleHiFreq);
+	hmPos.y *= 4;
 
+	hmNorm = getNormalVector(sample, du, dv);// + getNormalVector(sampleHiFreq, du, dv); //getNormalFromGrad(ugrad, vgrad);
+
+	vec4 pos = mvp * vec4(hmPos, 1.0f);
+
+	VertexOut.viewDir = normalize(-camPos - hmPos);
 	VertexOut.texCoord = in_texCoord;
-	VertexOut.normal = hmNorm;
+	VertexOut.normal = normalize(hmNorm);
 
-	//vec4 pos = in_Position;
-	//pos.y = snoise(pos.xz);
-
-
-    //VertexOut.pos = in_Position;
     VertexOut.pos.x = in_Position.x/gridWidth;
     VertexOut.pos.y = in_Position.y/gridHeight;
     VertexOut.pos.z = 0.0f;
