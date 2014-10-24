@@ -104,7 +104,6 @@ bool Terrain::generateGrid()
 	i = 0;
 
 	for (unsigned int row=0; row<kGridHeight-1; row++ ) 
-	//for (int row=kGridHeight-2; row>=0; row-- ) 
 	{
         if ((row&1)==0) 
 		{ // even rows
@@ -125,6 +124,7 @@ bool Terrain::generateGrid()
     }
 
 	i = 0;
+
 	for(unsigned int row=0; row<kGridHeight; ++row)
 	{
 		for(unsigned int col=0; col<kGridWidth; ++col)
@@ -168,7 +168,7 @@ void Terrain::render(const glm::mat4 &MV, const glm::mat4 &proj, const glm::vec3
 	//Fbo::useFbo(fbo1, 0L, 0L); // Draw to a Frame Buffer Object
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//glClearColor(0.5f, 0.5f, 0.5f, 0.f);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.f);
+	glClearColor(0.5f, .5f, 0.5f, 0.f);
 	glUseProgram(shaderManager.getId(ShaderManager::shaderId::MAIN));
 	glUniformMatrix4fv(
 		glGetUniformLocation(shaderManager.getId(ShaderManager::shaderId::MAIN), "mvp"), 
@@ -176,6 +176,7 @@ void Terrain::render(const glm::mat4 &MV, const glm::mat4 &proj, const glm::vec3
 	printError("mvp");
 	glUniform1ui(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "gridWidth"),kGridWidth);
 	glUniform1ui(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "gridHeight"),kGridHeight);
+	glUniform1f(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "gridSpacing"),kGridPointSpacing);
 	printError("grid dimensions");
 	glUniform3fv(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "camPos"), 1, glm::value_ptr(campos));
 	printError("camera position");

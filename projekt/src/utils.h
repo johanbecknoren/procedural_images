@@ -10,9 +10,9 @@
 const int kWidth = 1280;
 const int kHeight = 720;
 
-const unsigned int kGridWidth = 80;
-const unsigned int kGridHeight = 80;
-const unsigned int kGridPointSpacing = 1;
+const unsigned int kGridWidth = 500;
+const unsigned int kGridHeight = 500;
+const float kGridPointSpacing = .8f;
 
 const float M_PI = 3.14159f; 
 

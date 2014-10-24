@@ -72,22 +72,34 @@ float snoise(vec2 v)
   vec3 g;
   g.x  = a0.x  * x0.x  + h.x  * x0.y;
   g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+
+#if 0
+  float res = 130.0 * dot(m, g);
+  if(res < 0.f)
+  	return 0.f;
+  else
+  	return res;
+#else
   return 130.0 * dot(m, g);
+#endif
 }
 
 const vec2 size = vec2(2.0,0.0);
 const ivec3 off = ivec3(-1,0,1);
+const float maxHeight = 4.f;
 
 uniform mat4 mvp;
 uniform vec3 camPos;
 uniform unsigned int gridWidth;
 uniform unsigned int gridHeight;
+uniform float gridSpacing;
 
 out VertexData {
 	vec3 pos;
 	vec3 normal;
     vec2 texCoord;
     vec3 viewDir;
+    float height;
 } VertexOut;
 
 float getGradU(vec2 samplePos, float du)
@@ -110,28 +122,39 @@ vec3 getNormalVector(vec2 samplePos, float du, float dv)
 	return getNormalFromGrad(getGradU(samplePos, du), getGradV(samplePos, dv));
 }
 
+// ToDo normalisera Brownian Motion-resultatet till [0,1]
+
+
+
 void main(void)
 {
 	vec3 hmNorm = in_Normal;
-	vec3 hmPos = in_Position;
 
 	float du = 1.f/float(gridWidth);
 	float dv = 1.f/float(gridHeight);
 
 	// ToDo offset this samplepos by camera position and/or direction
-	vec2 sample = vec2(hmPos.x/20, hmPos.z/20) + camPos.xz;
-	vec2 sampleHiFreq = vec2(hmPos.x/10, hmPos.z/10) + camPos.xz;
+	vec2 sample = vec2(in_Position.x/20, in_Position.z/20) + camPos.xz/float(gridSpacing);
+	vec2 sampleHiFreq = vec2(in_Position.x/10, in_Position.z/10) + camPos.xz*2.f/float(gridSpacing);
 
-	hmPos.y = snoise(sample);//+0.5*snoise(sampleHiFreq);
-	hmPos.y *= 4;
+	vec3 hmPos = in_Position;
+	hmPos.y = snoise(sample)+0.5*snoise(sampleHiFreq); // snoise returns [-1,1]
+	hmPos.y *= maxHeight;
 
-	hmNorm = getNormalVector(sample, du, dv);// + getNormalVector(sampleHiFreq, du, dv); //getNormalFromGrad(ugrad, vgrad);
-
+	if(hmPos.y < -1)
+	{
+	 	//hmPos.y = -1;
+	 	//hmNorm = vec3(0,1,0);
+	}
+	
+	hmNorm = getNormalVector(sample, du, dv) + getNormalVector(sampleHiFreq, du, dv); //getNormalFromGrad(ugrad, vgrad);
+	
 	vec4 pos = mvp * vec4(hmPos, 1.0f);
 
 	VertexOut.viewDir = normalize(-camPos - hmPos);
 	VertexOut.texCoord = in_texCoord;
 	VertexOut.normal = normalize(hmNorm);
+	VertexOut.height = hmPos.y / maxHeight;
 
     VertexOut.pos.x = in_Position.x/gridWidth;
     VertexOut.pos.y = in_Position.y/gridHeight;
