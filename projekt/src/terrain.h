@@ -18,6 +18,7 @@ public:
 	void init();
 	void render(const glm::mat4 &MV, const glm::mat4 &proj, const glm::vec3 &campos);
 	void renderPatches(const Camera& cam);
+	void drawTerrain();
 	void reloadShaders();
 
 	bool getWireframeRender() const { return drawWireframe; }

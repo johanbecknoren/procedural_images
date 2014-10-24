@@ -73,20 +73,8 @@ float snoise(vec2 v)
   g.x  = a0.x  * x0.x  + h.x  * x0.y;
   g.yz = a0.yz * x12.xz + h.yz * x12.yw;
 
-#if 0
-  float res = 130.0 * dot(m, g);
-  if(res < 0.f)
-  	return 0.f;
-  else
-  	return res;
-#else
   return 130.0 * dot(m, g);
-#endif
 }
-
-const vec2 size = vec2(2.0,0.0);
-const ivec3 off = ivec3(-1,0,1);
-const float maxHeight = 4.f;
 
 uniform mat4 mvp;
 uniform vec3 camPos;
@@ -94,20 +82,31 @@ uniform unsigned int gridWidth;
 uniform unsigned int gridHeight;
 uniform float gridSpacing;
 
+const float maxHeight = 1.3f;
+float du = 1.f/float(gridWidth);
+float dv = 1.f/float(gridHeight);
+
 out VertexData {
 	vec3 pos;
 	vec3 normal;
-    vec2 texCoord;
     vec3 viewDir;
     float height;
+    float depth;
 } VertexOut;
 
-float getGradU(vec2 samplePos, float du)
+float normalizeDepth(float depth)
+{
+	float far = 400.f;
+	float near = 1.0f;
+	return (far+near)/(far-near) + 1.f/depth*((-2.f*far*near)/(far-near));
+}
+
+float getGradU(vec2 samplePos)
 {
 	return snoise(vec2(samplePos.x+du, samplePos.y)) - snoise(vec2(samplePos.x-du, samplePos.y));
 }
 
-float getGradV(vec2 samplePos, float dv)
+float getGradV(vec2 samplePos)
 {
 	return snoise(vec2(samplePos.x, samplePos.y+dv)) - snoise(vec2(samplePos.x, samplePos.y-dv));
 }
@@ -117,44 +116,64 @@ vec3 getNormalFromGrad(float ugrad, float vgrad)
 	return vec3(-ugrad, 0.1, vgrad);
 }
 
-vec3 getNormalVector(vec2 samplePos, float du, float dv)
+vec3 getNormalVector(vec2 samplePos)
 {
-	return getNormalFromGrad(getGradU(samplePos, du), getGradV(samplePos, dv));
+	return getNormalFromGrad(getGradU(samplePos), getGradV(samplePos));
 }
 
 // ToDo normalisera Brownian Motion-resultatet till [0,1]
 
+vec4 sumOctaves(vec2 samplePos, float initFreq, int numOctaves, float persistence)
+{
+	float amp = 1.f;
+	float maxAmp = 0.f;
+	float res = 0.f;
+	float freq = initFreq;
+	vec3 normal = vec3(0.f);
+	vec4 comboRes;
+	for(int i=0; i<numOctaves; ++i)
+	{
+		res += snoise(samplePos*freq) * amp;
+		normal += getNormalVector(samplePos*initFreq);
 
+		maxAmp += amp;
+		amp *= persistence; //0.5f
+		freq *= 2.f;
+	}
+
+	res /= maxAmp;
+
+	res = res * (1.f-0.f)/2.f + (1.f+0.f)/2.f;
+
+	return vec4(normal.x, normal.y, normal.z, res);
+}
 
 void main(void)
 {
+	vec2 sample = vec2(in_Position.x, in_Position.z) + camPos.xz/float(gridSpacing);
 	vec3 hmNorm = in_Normal;
-
-	float du = 1.f/float(gridWidth);
-	float dv = 1.f/float(gridHeight);
-
-	// ToDo offset this samplepos by camera position and/or direction
-	vec2 sample = vec2(in_Position.x/20, in_Position.z/20) + camPos.xz/float(gridSpacing);
-	vec2 sampleHiFreq = vec2(in_Position.x/10, in_Position.z/10) + camPos.xz*2.f/float(gridSpacing);
-
 	vec3 hmPos = in_Position;
-	hmPos.y = snoise(sample)+0.5*snoise(sampleHiFreq); // snoise returns [-1,1]
+	
+	vec4 normalAndHeight = sumOctaves(sample, 1.f/1.5f, 1, 0.5f);
+	hmNorm = normalAndHeight.rgb;
+	hmPos.y =  normalAndHeight.a;
 	hmPos.y *= maxHeight;
 
-	if(hmPos.y < -1)
+	if(hmPos.y < 0.5)
 	{
-	 	//hmPos.y = -1;
+	 	hmPos.y = 0.5;
 	 	//hmNorm = vec3(0,1,0);
 	}
 	
-	hmNorm = getNormalVector(sample, du, dv) + getNormalVector(sampleHiFreq, du, dv); //getNormalFromGrad(ugrad, vgrad);
+	vec3 viewVec = camPos + hmPos;
+	float depth = 1.f-normalizeDepth(length(viewVec));
 	
 	vec4 pos = mvp * vec4(hmPos, 1.0f);
 
 	VertexOut.viewDir = normalize(-camPos - hmPos);
-	VertexOut.texCoord = in_texCoord;
 	VertexOut.normal = normalize(hmNorm);
 	VertexOut.height = hmPos.y / maxHeight;
+	VertexOut.depth = depth;
 
     VertexOut.pos.x = in_Position.x/gridWidth;
     VertexOut.pos.y = in_Position.y/gridHeight;

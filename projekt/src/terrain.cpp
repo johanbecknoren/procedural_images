@@ -162,6 +162,16 @@ bool Terrain::generateGrid()
 	return true;
 }
 
+void Terrain::drawTerrain()
+{
+	glBindVertexArray(_vao);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ib);
+	if(!drawWireframe)
+		glDrawElements(GL_TRIANGLE_STRIP, getIndexCount(), GL_UNSIGNED_INT, 0L);
+	else
+		glDrawElements(GL_LINE_LOOP, getIndexCount(), GL_UNSIGNED_INT, 0L);
+}
+
 void Terrain::render(const glm::mat4 &MV, const glm::mat4 &proj, const glm::vec3 &campos) {
 
 	glm::mat4 mvp = proj * MV;
@@ -190,25 +200,20 @@ void Terrain::render(const glm::mat4 &MV, const glm::mat4 &proj, const glm::vec3
 	glFlush();
 
 	// Draw full screen quad
-	//Fbo::useFbo(0L,fbo1, 0L);
-	////Fbo::useFbo(0L,0L,0L);
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//glClearColor(0.5f, 0.5f, 0.5f, 0.f);
-	//glUseProgram(shaderManager.getId(ShaderManager::shaderId::TEX2SCREEN));
-	//glUniform1i(
-	//	glGetUniformLocation(shaderManager.getId(ShaderManager::shaderId::TEX2SCREEN), "texUnit"), 
-	//	0);
-	//DrawModel(quad);
-	//printError("Draw viewport quad");
-	//glFlush();
+	Fbo::useFbo(0L,fbo1, 0L);
+	//Fbo::useFbo(0L,0L,0L);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0.5f, 0.5f, 0.5f, 0.f);
+	glUseProgram(shaderManager.getId(ShaderManager::shaderId::TEX2SCREEN));
+	glUniform1i(
+		glGetUniformLocation(shaderManager.getId(ShaderManager::shaderId::TEX2SCREEN), "texUnit"), 
+		0);
+	DrawModel(quad);
+	printError("Draw viewport quad");
+	glFlush();
 #else
 	
-	glBindVertexArray(_vao);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ib);
-	if(!drawWireframe)
-		glDrawElements(GL_TRIANGLE_STRIP, getIndexCount(), GL_UNSIGNED_INT, 0L);
-	else
-		glDrawElements(GL_LINE_LOOP, getIndexCount(), GL_UNSIGNED_INT, 0L);
+	drawTerrain();
 	printError("Terrain render");
 	glFlush();
 #endif

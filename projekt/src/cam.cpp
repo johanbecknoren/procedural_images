@@ -10,7 +10,7 @@ Camera::Camera(int theWindowWidth, int theWindowHeight)
 {
 	initCamera();
 
-	speedFactor = 0.1f;
+	speedFactor = 0.02f;
  
 	windowWidth  = theWindowWidth;
 	windowHeight = theWindowHeight;
@@ -34,8 +34,8 @@ Camera::~Camera()
 void Camera::initCamera()
 {
 	// Set position, rotation and speed values to zero
-	position = glm::vec3(0.f, 5.f, 0.f);
-	rotation = glm::vec3(15.f, 135.f, 15.f);
+	position = glm::vec3(0.f, 2.f, 0.f);
+	rotation = glm::vec3(19.f, 135.f, 19.f);
 	speed = glm::vec3(0.f);
  
 	// How fast we move (higher values mean we move and strafe faster)
@@ -123,7 +123,7 @@ glm::mat4 Camera::getModelView() {
 	view = glm::rotate(view, rotation.x, glm::vec3(1.f, 0.f, 0.f));
 	view = glm::rotate(view, rotation.y, glm::vec3(0.f, 1.f, 0.f));
 	//view = glm::translate(view, -position);
-	view = glm::translate(view, -1.f*glm::vec3(0.f, 10.f, 0.f));
+	view = glm::translate(view, -1.f*glm::vec3(0.f, 2.f, 0.f));
 	//view = glm::translate(view, -1.f*glm::vec3(-10.f, 5.f, -10.f));
 	
 	/*view = glm::rotate(view, rotation.x, glm::vec3(1.f, 0.f, 0.f));
