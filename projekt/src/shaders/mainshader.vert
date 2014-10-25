@@ -133,7 +133,7 @@ vec4 sumOctaves(vec2 samplePos, float initFreq, int numOctaves, float persistenc
 	for(int i=0; i<numOctaves; ++i)
 	{
 		res += snoise(samplePos*freq) * amp;
-		normal += getNormalVector(samplePos*initFreq);
+		normal += getNormalVector(samplePos*freq) * amp;
 
 		maxAmp += amp;
 		amp *= persistence;
@@ -153,14 +153,14 @@ void main(void)
 	vec3 hmNorm = in_Normal;
 	vec3 hmPos = in_Position;
 	
-	vec4 normalAndHeight = sumOctaves(sample, 1.f/1.5f, 3, 0.5f);
+	vec4 normalAndHeight = sumOctaves(sample, 1.f/1.5f, 4, 0.3f);
 	hmNorm = normalAndHeight.rgb;
 	hmPos.y =  normalAndHeight.a;
 	hmPos.y *= maxHeight;
 
-	if(hmPos.y < 0.45)
+	if(hmPos.y < 0.45*maxHeight)
 	{
-	 	hmPos.y = 0.45;
+	 	hmPos.y = 0.45*maxHeight;
 	 	//hmNorm = vec3(0,1,0);
 	}
 	
