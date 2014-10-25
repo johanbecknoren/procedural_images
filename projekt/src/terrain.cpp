@@ -34,7 +34,9 @@ void initGL() {
 }
 
 Terrain::Terrain() {
-	_numOctaves = 2;
+	_numOctaves = 6;
+	_waterLevel = 0.4f;
+	_drawWireframe = false;
 }
 
 void Terrain::reloadShaders() {
@@ -166,10 +168,12 @@ void Terrain::drawTerrain()
 {
 	glBindVertexArray(_vao);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ib);
-	if(!drawWireframe)
-		glDrawElements(GL_TRIANGLE_STRIP, getIndexCount(), GL_UNSIGNED_INT, 0L);
-	else
+	
+	if(_drawWireframe)
 		glDrawElements(GL_LINE_LOOP, getIndexCount(), GL_UNSIGNED_INT, 0L);
+	else
+		glDrawElements(GL_TRIANGLE_STRIP, getIndexCount(), GL_UNSIGNED_INT, 0L);
+		
 }
 
 void Terrain::render(const glm::mat4 &MV, const glm::mat4 &proj, const glm::vec3 &campos) {
@@ -191,6 +195,7 @@ void Terrain::render(const glm::mat4 &MV, const glm::mat4 &proj, const glm::vec3
 	glUniform3fv(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "camPos"), 1, glm::value_ptr(campos));
 	printError("camera position");
 	glUniform1i(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "numberOfOctaves"),_numOctaves);
+	glUniform1f(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "waterLevel"),_waterLevel);
 	printError("other");
 #ifndef RENDER_GRID	
 	if(!drawWireframe)
@@ -217,7 +222,8 @@ void Terrain::render(const glm::mat4 &MV, const glm::mat4 &proj, const glm::vec3
 	
 	drawTerrain();
 	printError("Terrain render");
-	glFlush();
+	//glFlush();
+	glFinish();
 #endif
 }
 

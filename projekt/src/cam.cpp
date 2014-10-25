@@ -9,8 +9,6 @@ const float Camera::TO_RADS = 3.141592654f / 180.0f; // The value of 1 degree in
 Camera::Camera(int theWindowWidth, int theWindowHeight)
 {
 	initCamera();
-
-	speedFactor = 0.02f;
  
 	windowWidth  = theWindowWidth;
 	windowHeight = theWindowHeight;
@@ -39,7 +37,7 @@ void Camera::initCamera()
 	speed = glm::vec3(0.f);
  
 	// How fast we move (higher values mean we move and strafe faster)
-	movementSpeedFactor = 10.0f;
+	movementSpeedFactor = 8.0f;
  
 	pitchSensitivity = 0.2f; // How sensitive mouse movements affect looking up and down
 	yawSensitivity   = 0.2f; // How sensitive mouse movements affect looking left and right
@@ -188,7 +186,7 @@ void Camera::move(float deltaTime)
 		movement = glm::normalize(movement);
  
 	// Calculate our value to keep the movement the same speed regardless of the framerate...
-	float framerateIndependentFactor = movementSpeedFactor * (deltaTime * speedFactor);
+	float framerateIndependentFactor = movementSpeedFactor * deltaTime;
  
 	// .. and then apply it to our movement vector.
 	movement *= framerateIndependentFactor;

@@ -82,16 +82,16 @@ uniform uint gridWidth;
 uniform uint gridHeight;
 uniform float gridSpacing;
 uniform int numberOfOctaves;
+uniform float waterLevel;
 
-const float maxHeight = 1.5f;
 float du = 1.f/float(gridWidth);
 float dv = 1.f/float(gridHeight);
+const float maxHeight = 1.5f;
 
 out VertexData {
-	vec3 pos;
 	vec3 normal;
+	float height;
     vec3 viewDir;
-    float height;
     float depth;
 } VertexOut;
 
@@ -113,9 +113,9 @@ float getDiffV(vec2 samplePos)
 }
 
 // http://mathworld.wolfram.com/NormalVector.html
-vec3 getNormalFromGrad(float ugrad, float vgrad)
+vec3 getNormalFromGrad(float udiff, float vdiff)
 {
-	return vec3(ugrad, vgrad, 0.01f);
+	return vec3(udiff, vdiff, 0.01f);
 }
 
 vec3 getNormalVector(vec2 samplePos)
@@ -143,41 +143,35 @@ vec4 sumOctaves(vec2 samplePos, float initFreq, float persistence)
 
 	res /= maxAmp;
 
-	res = res * (1.f-0.f)/2.f + (1.f+0.f)/2.f;
+	res = res * 0.5f + 0.5f; // MAD, nice ^^
 
 	return vec4(normal.x, normal.y, normal.z, res);
 }
 
 void main(void)
 {
-	vec2 sample = vec2(in_Position.x, in_Position.z) + camPos.xz/float(gridSpacing);
+	vec2 sample = vec2(in_Position.x, in_Position.z) + camPos.xz;///float(gridSpacing);
 	vec3 hmNorm = in_Normal;
 	vec3 hmPos = in_Position;
-	
-	vec4 normalAndHeight = sumOctaves(sample, 1.f/1.5f, 0.5f);
+
+	vec4 normalAndHeight = sumOctaves(sample, 1.f/10.f, 0.7f);
 	hmNorm = normalAndHeight.rgb;
 	hmPos.y =  normalAndHeight.a;
+
+	if(hmPos.y < waterLevel-0.01f)
+	{
+	 	hmPos.y = waterLevel-0.01f;
+	 	//hmNorm = vec3(0,-1,0);
+	}
+
 	hmPos.y *= maxHeight;
 
-	if(hmPos.y < 0.45*maxHeight)
-	{
-	 	hmPos.y = 0.45*maxHeight;
-	 	//hmNorm = vec3(0,1,0);
-	}
-	
-	vec3 viewVec = camPos + hmPos;
-	float depth = 1.f-normalizeDepth(length(viewVec));
-	
-	vec4 pos = mvp * vec4(hmPos, 1.0f);
+	//vec3 viewVec = camPos + hmPos;
+	//float depth = 1.f-normalizeDepth(length(viewVec));
 
-	VertexOut.viewDir = normalize(-camPos - hmPos);
 	VertexOut.normal = normalize(hmNorm);
 	VertexOut.height = hmPos.y / maxHeight;
-	VertexOut.depth = depth;
 
-    VertexOut.pos.x = in_Position.x/gridWidth;
-    VertexOut.pos.y = in_Position.y/gridHeight;
-    VertexOut.pos.z = 0.0f;
-
+	vec4 pos = mvp * vec4(hmPos, 1.0f);
     gl_Position = pos;
 }

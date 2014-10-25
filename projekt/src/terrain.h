@@ -21,9 +21,10 @@ public:
 	void drawTerrain();
 	void reloadShaders();
 	void updateNumOctaves(const int& n) { if((_numOctaves + n) > 0) _numOctaves += n; };
+	void updateWaterLevel(const float& n) { if((_waterLevel + n) > 0.f && (_waterLevel + n) <= 1.0f) _waterLevel += n; };
 
-	bool getWireframeRender() const { return drawWireframe; }
-	void toggleWireRender() { drawWireframe = !drawWireframe; }
+	bool getWireframeRender() const { return _drawWireframe; }
+	void toggleWireRender() { _drawWireframe = !_drawWireframe; }
 
 	bool generateGrid();
 
@@ -47,9 +48,10 @@ private:
 	GLuint _vao,_vb,_ib,_nb;
 
 	int _numOctaves;
+	float _waterLevel; // [0,1]
 
 	ShaderManager shaderManager;
 
-	bool drawWireframe;
+	bool _drawWireframe;
 };
 #endif TERRAIN_H

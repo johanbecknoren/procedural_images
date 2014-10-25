@@ -42,8 +42,6 @@ class Camera
     public:
         static const float TO_RADS; // The value of 1 degree in radians
 
-		float speedFactor;
- 
         // Holding any keys down?
         bool holdingForward;
         bool holdingBackward;

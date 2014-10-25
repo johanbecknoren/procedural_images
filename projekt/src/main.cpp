@@ -13,18 +13,6 @@
 
 Camera cam(kWidth, kHeight);
 
-//GLfloat verts[9] = {0.0f,0.0f,0.0f, 0.0f,1.0f,0.0f, 1.0f,1.0f,0.0f};
-//GLfloat normal[3] = {0.0f,0.0f,-1.0f};
-//GLfloat colors[9] = {0.0f,0.0f,0.0f, 0.0f,1.0f,0.0f, 1.0f,1.0f,0.0f};
-//
-//Fbo* fbo1;
-//Fbo* fbo2;
-//
-//Model* box;
-//Model* quad;
-//
-//ShaderManager shaderManager;
-
 Terrain terrain;
 
 void printError(const char *functionName)
@@ -81,6 +69,14 @@ static void key_callback(int key, int action ,int mods) {
 		if(action == GLFW_PRESS) {
 			terrain.updateNumOctaves(-1);
 		} 
+	} else if(key == '+') {
+		if(action == GLFW_PRESS) {
+			terrain.updateWaterLevel(0.01f);
+		} 
+	} else if(key == '-') {
+		if(action == GLFW_PRESS) {
+			terrain.updateWaterLevel(-0.01f);
+		} 
 	}
 }
 
@@ -107,6 +103,26 @@ static void handle_mouse_button(int button, int action, int mods) {
 		else if(action == GLFW_RELEASE)
 			cam.holdingRMB = false;
 	}
+}
+
+char* lltoa(long long val, int base){
+
+    static char buf[64] = {0};
+
+    int i = 62;
+    int sign = (val < 0);
+    if(sign) val = -val;
+
+    if(val == 0) return "0";
+
+    for(; val && i ; --i, val /= base) {
+        buf[i] = "0123456789abcdef"[val % base];
+    }
+
+    if(sign) {
+        buf[i--] = '-';
+    }
+    return &buf[i+1];
 }
 
 int main(int argc, char** argv) {
@@ -139,10 +155,11 @@ int main(int argc, char** argv) {
 	float deltaT = 0.01f;
 
 	first_time = true;
+	bool quit = false;
+	high_resolution_clock::time_point c1;
 
 	terrain.init();
 
-	bool quit = false;
 	while(!quit) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		currentTime = float(glfwGetTime());
@@ -152,11 +169,17 @@ int main(int argc, char** argv) {
 		cam.move(deltaT);
 		printError("Error moving camera");
 
+		c1 = high_resolution_clock::now();
 		terrain.render(cam.getModelView(), cam.getProjection(), cam.getPosition());
+		auto elapsed = std::chrono::duration_cast<milliseconds>(high_resolution_clock::now() - c1);
 
 		// Swap buffers
 		glfwSwapBuffers();
 		printError("Swap buffers");
+
+		
+		glfwSetWindowTitle( lltoa(elapsed.count(),10) );
+
 		if(glfwGetKey('Q') || !glfwGetWindowParam(GLFW_OPENED) ) {
 			quit = true;
 		}
