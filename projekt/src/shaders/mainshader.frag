@@ -10,9 +10,9 @@ in VertexData {
 
 out vec4 out_Color;
 
-const vec3 lightDir = normalize(vec3(1.f, 0.5f,0.f));
+const vec3 lightDir = normalize(vec3(1.f, 1.f, 0.6f));
 const vec4 lightColor = vec4(0.,1,0.,1);
-const vec4 ambientLightColor = vec4(0.3,0.3,0.3,1); // gray
+const vec4 ambientLightColor = vec4(0.3,0.3,0.,1); // gray
 
 void main(void)
 {
@@ -21,11 +21,12 @@ void main(void)
 	float dotprod = (dot(lightDir, FragIn.normal));
 	dotprod = dotprod>0?dotprod:0.0f;
 	out_Color = 
-	0.2*ambientLightColor 
+	0.3*ambientLightColor 
 	+ lightColor*dotprod
 	//+ (FragIn.height>0.5f?vec4(1,1,1,1):vec4(0))
 	+ (FragIn.height<0.5f?vec4(0,0,1.,1):vec4(0));//*dotprod;
 
 	out_Color.a = 1.0f;
 	//out_Color.rgb = vec3(FragIn.depth);
+	out_Color.rgb = FragIn.normal;
 }

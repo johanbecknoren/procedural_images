@@ -78,11 +78,11 @@ float snoise(vec2 v)
 
 uniform mat4 mvp;
 uniform vec3 camPos;
-uniform unsigned int gridWidth;
-uniform unsigned int gridHeight;
+uniform uint gridWidth;
+uniform uint gridHeight;
 uniform float gridSpacing;
 
-const float maxHeight = 1.3f;
+const float maxHeight = 1.5f;
 float du = 1.f/float(gridWidth);
 float dv = 1.f/float(gridHeight);
 
@@ -113,15 +113,14 @@ float getGradV(vec2 samplePos)
 
 vec3 getNormalFromGrad(float ugrad, float vgrad)
 {
-	return vec3(-ugrad, 0.1, vgrad);
+	return vec3(ugrad, vgrad, 0.01f);
+	//return vec3(-ugrad, 0.1f, vgrad);
 }
 
 vec3 getNormalVector(vec2 samplePos)
 {
 	return getNormalFromGrad(getGradU(samplePos), getGradV(samplePos));
 }
-
-// ToDo normalisera Brownian Motion-resultatet till [0,1]
 
 vec4 sumOctaves(vec2 samplePos, float initFreq, int numOctaves, float persistence)
 {
@@ -137,7 +136,7 @@ vec4 sumOctaves(vec2 samplePos, float initFreq, int numOctaves, float persistenc
 		normal += getNormalVector(samplePos*initFreq);
 
 		maxAmp += amp;
-		amp *= persistence; //0.5f
+		amp *= persistence;
 		freq *= 2.f;
 	}
 
@@ -154,14 +153,14 @@ void main(void)
 	vec3 hmNorm = in_Normal;
 	vec3 hmPos = in_Position;
 	
-	vec4 normalAndHeight = sumOctaves(sample, 1.f/1.5f, 1, 0.5f);
+	vec4 normalAndHeight = sumOctaves(sample, 1.f/1.5f, 3, 0.5f);
 	hmNorm = normalAndHeight.rgb;
 	hmPos.y =  normalAndHeight.a;
 	hmPos.y *= maxHeight;
 
-	if(hmPos.y < 0.5)
+	if(hmPos.y < 0.45)
 	{
-	 	hmPos.y = 0.5;
+	 	hmPos.y = 0.45;
 	 	//hmNorm = vec3(0,1,0);
 	}
 	
