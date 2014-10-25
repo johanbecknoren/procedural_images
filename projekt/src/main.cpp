@@ -73,6 +73,14 @@ static void key_callback(int key, int action ,int mods) {
 		} else if(action == GLFW_RELEASE) {
 			cam.holdingRightStrafe = false;
 		}
+	} else if(key == GLFW_KEY_KP_ADD) {
+		if(action == GLFW_PRESS) {
+			terrain.updateNumOctaves(1);
+		} 
+	} else if(key == GLFW_KEY_KP_SUBTRACT) {
+		if(action == GLFW_PRESS) {
+			terrain.updateNumOctaves(-1);
+		} 
 	}
 }
 

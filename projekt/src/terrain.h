@@ -20,6 +20,7 @@ public:
 	void renderPatches(const Camera& cam);
 	void drawTerrain();
 	void reloadShaders();
+	void updateNumOctaves(const int& n) { if((_numOctaves + n) > 0) _numOctaves += n; };
 
 	bool getWireframeRender() const { return drawWireframe; }
 	void toggleWireRender() { drawWireframe = !drawWireframe; }
@@ -44,6 +45,8 @@ private:
 	GLfloat* _vertexNormals;
 
 	GLuint _vao,_vb,_ib,_nb;
+
+	int _numOctaves;
 
 	ShaderManager shaderManager;
 

@@ -34,7 +34,7 @@ void initGL() {
 }
 
 Terrain::Terrain() {
-
+	_numOctaves = 2;
 }
 
 void Terrain::reloadShaders() {
@@ -190,6 +190,8 @@ void Terrain::render(const glm::mat4 &MV, const glm::mat4 &proj, const glm::vec3
 	printError("grid dimensions");
 	glUniform3fv(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "camPos"), 1, glm::value_ptr(campos));
 	printError("camera position");
+	glUniform1i(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "numberOfOctaves"),_numOctaves);
+	printError("other");
 #ifndef RENDER_GRID	
 	if(!drawWireframe)
 		DrawModel(box);

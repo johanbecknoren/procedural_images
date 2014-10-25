@@ -81,6 +81,7 @@ uniform vec3 camPos;
 uniform uint gridWidth;
 uniform uint gridHeight;
 uniform float gridSpacing;
+uniform int numberOfOctaves;
 
 const float maxHeight = 1.5f;
 float du = 1.f/float(gridWidth);
@@ -101,28 +102,28 @@ float normalizeDepth(float depth)
 	return (far+near)/(far-near) + 1.f/depth*((-2.f*far*near)/(far-near));
 }
 
-float getGradU(vec2 samplePos)
+// Surface differentials in u- and v directions
+float getDiffU(vec2 samplePos)
 {
 	return snoise(vec2(samplePos.x+du, samplePos.y)) - snoise(vec2(samplePos.x-du, samplePos.y));
 }
-
-float getGradV(vec2 samplePos)
+float getDiffV(vec2 samplePos)
 {
 	return snoise(vec2(samplePos.x, samplePos.y+dv)) - snoise(vec2(samplePos.x, samplePos.y-dv));
 }
 
+// http://mathworld.wolfram.com/NormalVector.html
 vec3 getNormalFromGrad(float ugrad, float vgrad)
 {
 	return vec3(ugrad, vgrad, 0.01f);
-	//return vec3(-ugrad, 0.1f, vgrad);
 }
 
 vec3 getNormalVector(vec2 samplePos)
 {
-	return getNormalFromGrad(getGradU(samplePos), getGradV(samplePos));
+	return getNormalFromGrad(getDiffU(samplePos), getDiffV(samplePos));
 }
 
-vec4 sumOctaves(vec2 samplePos, float initFreq, int numOctaves, float persistence)
+vec4 sumOctaves(vec2 samplePos, float initFreq, float persistence)
 {
 	float amp = 1.f;
 	float maxAmp = 0.f;
@@ -130,7 +131,7 @@ vec4 sumOctaves(vec2 samplePos, float initFreq, int numOctaves, float persistenc
 	float freq = initFreq;
 	vec3 normal = vec3(0.f);
 	vec4 comboRes;
-	for(int i=0; i<numOctaves; ++i)
+	for(int i=0; i<numberOfOctaves; ++i)
 	{
 		res += snoise(samplePos*freq) * amp;
 		normal += getNormalVector(samplePos*freq) * amp;
@@ -153,7 +154,7 @@ void main(void)
 	vec3 hmNorm = in_Normal;
 	vec3 hmPos = in_Position;
 	
-	vec4 normalAndHeight = sumOctaves(sample, 1.f/1.5f, 4, 0.3f);
+	vec4 normalAndHeight = sumOctaves(sample, 1.f/1.5f, 0.5f);
 	hmNorm = normalAndHeight.rgb;
 	hmPos.y =  normalAndHeight.a;
 	hmPos.y *= maxHeight;
