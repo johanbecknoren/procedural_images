@@ -1,26 +1,21 @@
-#version 410 core
+#version 430 core
 
 //define num of CPs in output patch
-layout(vertices = 3) out;
+layout (vertices = 3) out;
 
-// Used to calc TS (tessellation level)
-uniform vec3 eyeWorldPos;
+uniform vec3 camPos;
 
 in VertexData {
 	vec3 world_pos_tcs;
-	vec2 tex_coord_tcs;
-	vec3 normal_tcs;
-} TCSIn;
+} TCSIn[];
 
 out TCSData {
-	vec3 world_pos_tes[];
-	vec2 tex_coord_tes[];
-	vec3 normal_tes[];
-} TCSOut;
+	vec3 world_pos_tes;
+} TCSOut[];
 
 float GetTessLevel(float Distance0, float Distance1)
 {
-	return 7.0f; // for debugging
+	return 3.0f; // for debugging
 
     float AvgDistance = (Distance0 + Distance1) / 2.0;
 
@@ -36,19 +31,22 @@ float GetTessLevel(float Distance0, float Distance1)
 }
 
 void main(void) {
-	// Set control points for output patch
-	TCSOut.tex_coord_tes[gl_InvocationID] = TCSIn.tex_coord_tcs[gl_InvocationID];
-	TCSOut.normal_tes[gl_InvocationID] = TCSIn.normal_tcs[gl_InvocationID];
-	TCSOut.world_pos_tes[gl_InvocationID] = TCSIn.world_pos_tcs[gl_InvocationID];
-
 	// Distance from camera to each control point (vertex)
-	float eyeToVert0 = distance(eyeWorldPos, TCSOut.world_pos_tes[0]);
-	float eyeToVert1 = distance(eyeWorldPos, TCSOut.world_pos_tes[1]);
-	float eyeToVert2 = distance(eyeWorldPos, TCSOut.world_pos_tes[2]);
+	float eyeToVert0 = distance(camPos, TCSOut[0].world_pos_tes);
+	float eyeToVert1 = distance(camPos, TCSOut[1].world_pos_tes);
+	float eyeToVert2 = distance(camPos, TCSOut[2].world_pos_tes);
 
 	// Decide tessellation levels
-	gl_TessLevelOuter[0] = GetTessLevel(eyeToVert1, eyeToVert2);
-	gl_TessLevelOuter[1] = GetTessLevel(eyeToVert2, eyeToVert0);
-	gl_TessLevelOuter[2] = GetTessLevel(eyeToVert0, eyeToVert1);
-	gl_TessLevelInner[0] = gl_TessLevelOuter[2];
+	if(gl_InvocationID == 0)
+	{
+		gl_TessLevelOuter[0] = 3.0f;//GetTessLevel(eyeToVert1, eyeToVert2);
+		gl_TessLevelOuter[1] = 3.0f;//GetTessLevel(eyeToVert2, eyeToVert0);
+		gl_TessLevelOuter[2] = 3.0f;//GetTessLevel(eyeToVert0, eyeToVert1);
+
+		gl_TessLevelInner[0] = gl_TessLevelOuter[2];
+	}
+
+	// Set control points for output patch
+	//TCSOut[gl_InvocationID].world_pos_tes = TCSIn[gl_InvocationID].world_pos_tcs;
+	gl_out[gl_InvocationID].gl_Position	= gl_in[gl_InvocationID].gl_Position;
 }

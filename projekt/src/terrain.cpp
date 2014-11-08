@@ -17,16 +17,15 @@ void Terrain::printError(const char *functionName)
 void Terrain::loadShaders() {
 	shaderManager.loadShaders("mainshader.vert", "mainshader.frag", ShaderManager::shaderId::MAIN);
 	//shaderManager.loadShadersTG("tessellation.vert", "tessellation.frag", "tessellation.tcs", "tessellation.tes", "", ShaderManager::shaderId::MAIN);
-	shaderManager.loadShaders("textureToScreen.vert", "textureToScreen.frag", ShaderManager::TEX2SCREEN);
+	//shaderManager.loadShaders("textureToScreen.vert", "textureToScreen.frag", ShaderManager::TEX2SCREEN);
 }
 
 void initGL() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_FRONT);
 
 	GLint maxPatchVerts = 0;
 	glGetIntegerv(GL_MAX_PATCH_VERTICES, &maxPatchVerts);
@@ -142,42 +141,45 @@ bool Terrain::generateGrid()
 	glGenBuffers(1, &_ib);
 	glGenBuffers(1, &_nb);
 
-	glBindVertexArray(_vao);
 	// VBO for vertex data
+	glBindVertexArray(_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, _vb);
 	glBufferData(GL_ARRAY_BUFFER, getVertexCount()*sizeof(GLfloat), _vertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(
 		glGetAttribLocation(shaderManager.getId(ShaderManager::MAIN), "in_Position"), 3, GL_FLOAT, GL_FALSE,0,0);
 	glEnableVertexAttribArray(glGetAttribLocation(shaderManager.getId(ShaderManager::MAIN), "in_Position"));
-
+	printError("Binding buffers 0");
 	/*VBO for normal data here if needed*/
 	glBindBuffer(GL_ARRAY_BUFFER, _nb);
 	glBufferData(GL_ARRAY_BUFFER, getVertexCount()*sizeof(GLfloat), _vertexNormals, GL_STATIC_DRAW);
 	glVertexAttribPointer(
 		glGetAttribLocation(shaderManager.getId(ShaderManager::MAIN), "in_Normal"), 3, GL_FLOAT, GL_FALSE,0,0);
 	glEnableVertexAttribArray(glGetAttribLocation(shaderManager.getId(ShaderManager::MAIN), "in_Normal"));
+	printError("Binding buffers 1");
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ib);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, getIndexCount()*sizeof(GLuint), _vertexIndices, GL_STATIC_DRAW);
 
-	printError("Binding buffers");
+	printError("Binding buffers 2");
 	return true;
 }
 
 void Terrain::drawTerrain()
 {
+	/*glPatchParameteri( GL_PATCH_VERTICES, 3);*/
 	glBindVertexArray(_vao);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ib);
 	
 	if(_drawWireframe)
-		glDrawElements(GL_LINE_LOOP, getIndexCount(), GL_UNSIGNED_INT, 0L);
+		glDrawElements(GL_LINE_LOOP, getIndexCount(), GL_UNSIGNED_INT, NULL);
 	else
 		glDrawElements(GL_TRIANGLE_STRIP, getIndexCount(), GL_UNSIGNED_INT, 0L);
-		
+		//glDrawElements(GL_PATCHES, getIndexCount(), GL_UNSIGNED_INT, NULL);
+
 }
 
 void Terrain::render(const glm::mat4 &MV, const glm::mat4 &proj, const glm::vec3 &campos) {
-
+	glPatchParameteri( GL_PATCH_VERTICES, 3);
 	glm::mat4 mvp = proj * MV;
 	//Fbo::useFbo(fbo1, 0L, 0L); // Draw to a Frame Buffer Object
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -81,8 +81,6 @@ GLuint ShaderManager::compileShaders(const char *vs, const char *fs,
 	GLuint v,f,tc,te,g,p;
 	p = 0;
 
-	//printf(fs);
-
 	v = glCreateShader(GL_VERTEX_SHADER);
 	f = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(v, 1, &vs, NULL);
@@ -116,6 +114,8 @@ GLuint ShaderManager::compileShaders(const char *vs, const char *fs,
 
 	printShaderInfoLog(v, vfn);
 	printShaderInfoLog(f, ffn);
+	if(tcs != NULL) printShaderInfoLog(tc, tcfn);
+	if(tes != NULL) printShaderInfoLog(te, tefn);
 	if (gs != NULL)	printShaderInfoLog(g, gfn);
 
 	printProgramInfoLog(p, vfn, ffn, gfn);
@@ -217,8 +217,8 @@ GLuint ShaderManager::loadShaderG(const char *vertFileName, const char *fragFile
 		printf("Failed to read %s from disk.\n", vertFileName);
 	if (fs==NULL)
 		printf("Failed to read %s from disk.\n", fragFileName);
-	if ((gs==NULL) && (geomFileName != NULL))
-		printf("Failed to read %s from disk.\n", geomFileName);
+	//if ((gs==NULL) && (geomFileName != NULL))
+		//printf("Failed to read %s from disk.\n", geomFileName);
 	if ((vs!=NULL)&&(fs!=NULL))
 		p = compileShaders(vs, fs, gs, vertFileName, fragFileName, geomFileName);
 	if (vs != NULL) free(vs);
@@ -259,8 +259,8 @@ GLuint ShaderManager::loadShaderTG(const char *vertFileName, const char *fragFil
 		printf("Failed to read %s from disk.\n", tcsFileName);
 	if(tes == NULL && tesFileName != NULL)
 		printf("Failed to read %s from disk.\n", tesFileName);
-	if ((gs==NULL) && (geomFileName != NULL))
-		printf("Failed to read %s from disk.\n", geomFileName);
+	//if ((gs==NULL) && (geomFileName != NULL))
+		//printf("Failed to read %s from disk.\n", geomFileName);
 	if((vs!=NULL)&&(fs!=NULL)&&(tcs!=NULL)&&(tes!=NULL))
 		p = compileShaders(vs,fs,tcs,tes,gs,vertFileName,fragFileName,tcsFileName,tesFileName,geomFileName);
 	else if ((vs!=NULL)&&(fs!=NULL))

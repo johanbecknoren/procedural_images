@@ -1,27 +1,17 @@
-#version 410 core
+#version 430 core
 
 layout (triangles, equal_spacing, ccw) in;
 
-uniform mat4 camTrans;
-uniform sampler2D tex_height_map;
-uniform float displacement_factor;
+uniform mat4 mvp;
+uniform vec3 camPos;
 
-in TCSOut {
-	vec3 world_pos_tes[];
-	vec2 tex_coord_tes[];
-	vec3 normal_tes[];
-} TCSData;
+in TCSData {
+	vec3 world_pos_tes;
+} TCSin[];
 
 out TESOut {
 	vec3 world_pos_frag;
-	vec2 tex_coord_frag;
-	vec3 normal_frag;
 } TESData;
-
-vec2 interpolate2D(vec2 v0, vec2 v1, vec2 v2)
-{
-   	 return vec2(gl_TessCoord.x) * v0 + vec2(gl_TessCoord.y) * v1 + vec2(gl_TessCoord.z) * v2;
-}
 
 vec3 interpolate3D(vec3 v0, vec3 v1, vec3 v2)
 {
@@ -29,13 +19,14 @@ vec3 interpolate3D(vec3 v0, vec3 v1, vec3 v2)
 }
 
 void main(void) {
-	TESData.tex_coord_frag = interpolate2D(TCSData.tex_coord_tes[0], TCSData.tex_coord_tes[1], TCSData.tex_coord_tes[2]);
-	TESData.normal_frag = interpolate3D(TCSData.normal_tes[0], TCSData.normal_tes[1], TCSData.normal_tes[2]);
-	TESData.normal_frag = normalize(TESData.normal_frag);
-	TESData.world_pos_frag = interpolate3D(TCSData.world_pos_tes[0], TCSData.world_pos_tes[1], TCSData.world_pos_tes[2]);
+	// world pos for CP
+	vec3 pos = interpolate3D(gl_in[0].gl_Position.xyz, gl_in[1].gl_Position.xyz, gl_in[2].gl_Position.xyz);
+	//TESData.world_pos_frag = interpolate3D(TCSin[0].world_pos_tes, TCSin[1].world_pos_tes, TCSin[2].world_pos_tes);
+
+	//vec4 position = TCSin[0].world_pos_tes;
+	//position.xy += gl_TessCoord.xy*2.0f - 1.0f;
 
 	// Displace vertex along normal direction according to height map sample
-	float displacement = 1.f;//texture(tex_height_map, TESData.tex_coord_frag.xy).x;
-	TESData.world_pos_frag += 0.f;//TESData.normal_frag * displacement_factor * displacement;
-	gl_Position = camTrans * vec4(TESData.world_pos_frag, 1.0f);
+	TESData.world_pos_frag = pos;
+	gl_Position = mvp * vec4(pos, 1.0f);
 }
