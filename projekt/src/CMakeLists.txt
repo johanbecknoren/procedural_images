@@ -59,6 +59,10 @@ link_directories(
 set(SHADER_FILES
   ${CMAKE_SOURCE_DIR}/shaders/mainshader.frag
   ${CMAKE_SOURCE_DIR}/shaders/mainshader.vert
+  ${CMAKE_SOURCE_DIR}/shaders/tessellation.vert
+  ${CMAKE_SOURCE_DIR}/shaders/tessellation.tcs
+  ${CMAKE_SOURCE_DIR}/shaders/tessellation.tes
+  ${CMAKE_SOURCE_DIR}/shaders/tessellation.frag
 )
 
 source_group("The Shaders" FILES ${SHADER_FILES})
