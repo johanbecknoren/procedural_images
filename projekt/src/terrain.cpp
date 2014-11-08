@@ -194,6 +194,7 @@ void Terrain::render(const glm::mat4 &MV, const glm::mat4 &proj, const glm::vec3
 	glUniform1ui(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "gridHeight"),kGridHeight);
 	glUniform1f(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "gridSpacing"),kGridPointSpacing);
 	printError("grid dimensions");
+	// this is always the static cam pos, since it is only used to seed the terrain noise function in shader.
 	glUniform3fv(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "camPos"), 1, glm::value_ptr(campos));
 	printError("camera position");
 	glUniform1i(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "numberOfOctaves"),_numOctaves);

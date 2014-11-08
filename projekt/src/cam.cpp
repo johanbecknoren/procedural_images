@@ -19,7 +19,8 @@ Camera::Camera(int theWindowWidth, int theWindowHeight)
 
 	projection = glm::perspective(45.0f, (float)windowWidth / (float)windowHeight, 1.0f, 400.0f);
 
-	//glfwSetCursorPos(window, windowMidX, windowMidY);
+	isFreefly = false;
+
 	glfwSetMousePos(windowMidX,windowMidY);
 }
  
@@ -32,9 +33,9 @@ Camera::~Camera()
 void Camera::initCamera()
 {
 	// Set position, rotation and speed values to zero
-	position = glm::vec3(0.f, 2.f, 0.f);
-	rotation = glm::vec3(19.f, 135.f, 19.f);
-	speed = glm::vec3(0.f);
+	position = staticCamPosition = glm::vec3(0.f, 2.f, 0.f);
+	rotation = staticCamRotation = glm::vec3(19.f, 135.f, 19.f);
+	speed = staticCamSpeed = glm::vec3(0.f);
  
 	// How fast we move (higher values mean we move and strafe faster)
 	movementSpeedFactor = 8.0f;
@@ -58,6 +59,11 @@ const float Camera::toRads(const float &theAngleInDegrees) const
 // Function to deal with mouse position changes
 void Camera::handleMouseMove(int mouseX, int mouseY)
 {
+	return; // for debugging
+
+	if(!isFreefly)
+		return;
+
 	// Calculate our horizontal and vertical mouse movement from middle of the window
 	float horizMovement = float(mouseX - windowMidX+1) * yawSensitivity;
 	float vertMovement  = float(mouseY - windowMidY) * pitchSensitivity;
@@ -118,10 +124,22 @@ void Camera::handleMouseMove(int mouseX, int mouseY)
 glm::mat4 Camera::getModelView() {
 	glm::mat4 view;
 	
-	view = glm::rotate(view, rotation.x, glm::vec3(1.f, 0.f, 0.f));
-	view = glm::rotate(view, rotation.y, glm::vec3(0.f, 1.f, 0.f));
-	//view = glm::translate(view, -position);
-	view = glm::translate(view, -1.f*glm::vec3(0.f, 2.f, 0.f));
+	if(!isFreefly)
+	{
+		view = glm::rotate(view, staticCamRotation.x, glm::vec3(1.f, 0.f, 0.f));
+		view = glm::rotate(view, staticCamRotation.y, glm::vec3(0.f, 1.f, 0.f));
+	}
+	else
+	{
+		view = glm::rotate(view, rotation.x, glm::vec3(1.f, 0.f, 0.f));
+		view = glm::rotate(view, rotation.y, glm::vec3(0.f, 1.f, 0.f));
+	}
+	
+	if(!isFreefly)
+		view = glm::translate(view, -1.f*glm::vec3(0.f, 2.f, 0.f));
+	else
+		view = glm::translate(view, -position);
+
 	//view = glm::translate(view, -1.f*glm::vec3(-10.f, 5.f, -10.f));
 	
 	/*view = glm::rotate(view, rotation.x, glm::vec3(1.f, 0.f, 0.f));
@@ -192,5 +210,8 @@ void Camera::move(float deltaTime)
 	movement *= framerateIndependentFactor;
  
 	// Finally, apply the movement to our position
-	position += movement;
+	if(isFreefly)
+		position += movement;
+	else
+		staticCamPosition += movement;
 }

@@ -10,7 +10,7 @@
 
 #include "utils.h"
  
-// BORROWED FROM http://r3dux.org/2012/12/a-c-camera-class-for-simple-opengl-fps-controls/
+// BASE IMPLEMENTATION BORROWED FROM http://r3dux.org/2012/12/a-c-camera-class-for-simple-opengl-fps-controls/
 
 class Camera
 {
@@ -39,6 +39,10 @@ class Camera
         // Method to set some reasonable default values. For internal use by the class only.
         void initCamera();
 
+		glm::vec3 staticCamPosition;
+		glm::vec3 staticCamRotation;
+		glm::vec3 staticCamSpeed;
+
     public:
         static const float TO_RADS; // The value of 1 degree in radians
 
@@ -49,6 +53,7 @@ class Camera
         bool holdingRightStrafe;
 		bool holdingLMB;
 		bool holdingRMB;
+		bool isFreefly;
  
         // Constructors
         Camera(int windowWidth, int windowHeight);
@@ -79,7 +84,8 @@ class Camera
         void  setYawSensitivity(float value)   { yawSensitivity   = value; }
  
         // Position getters
-        glm::vec3 getPosition() const { return position;        }
+        //glm::vec3 getPosition()	  const { return (isFreefly) ? staticCamPosition : position; }
+		glm::vec3 getPosition()	  const { return staticCamPosition; } // Only used to seed noise function
         float getXPos()           const { return position.x; }
         float getYPos()           const { return position.y; }
         float getZPos()           const { return position.z; }
@@ -89,6 +95,9 @@ class Camera
         float getXRot()           const { return rotation.x; }
         float getYRot()           const { return rotation.y; }
         float getZRot()           const { return rotation.z; }
+
+		void toggleFreefly() { isFreefly = !isFreefly; }
+		bool getFreeFly() const { return isFreefly; }
 };
  
 #endif // CAMERA_H

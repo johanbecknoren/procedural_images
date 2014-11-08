@@ -77,6 +77,10 @@ static void key_callback(int key, int action ,int mods) {
 		if(action == GLFW_PRESS) {
 			terrain.updateWaterLevel(-0.01f);
 		} 
+	} else if(key == 'E') {
+		if(action == GLFW_PRESS) {
+			cam.toggleFreefly();
+		}
 	}
 }
 
@@ -84,10 +88,9 @@ bool first_time;
 
 static void handle_mouse_move(int mouse_x, int mouse_y) {
 	//std::cout<<"mouse_x:"<<mouse_x<<",mouse_y:"<<mouse_y<<std::endl;
-	if(!first_time)
+	if(!cam.getFreeFly())
 		cam.handleMouseMove(mouse_x, mouse_y);
-	else
-		first_time = false;
+	
 }
 
 static void handle_mouse_button(int button, int action, int mods) {
@@ -148,7 +151,7 @@ int main(int argc, char** argv) {
 	glClearColor(real(0),real(0),real(0),real(0));
 	glfwSwapInterval(0);
 	glfwSetKeyCallback((GLFWkeyfun)key_callback);
-	//glfwSetMousePosCallback((GLFWmouseposfun)handle_mouse_move);
+	glfwSetMousePosCallback((GLFWmouseposfun)handle_mouse_move);
 	glfwSetMouseButtonCallback((GLFWmousebuttonfun)handle_mouse_button);
 
 	float currentTime, lastTime = 0.0f;

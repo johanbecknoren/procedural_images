@@ -4,7 +4,8 @@
 #include <stdint.h>
 #include <chrono>
 
-#define CMAKE_PROJECT_ROOT_DIR "C:/code/Other/procedural_images/projekt"//"G:/LiU/Ak5/Procedurella/git-repot/procedural_images/projekt"
+//#define CMAKE_PROJECT_ROOT_DIR "C:/code/Other/procedural_images/projekt"//"G:/LiU/Ak5/Procedurella/git-repot/procedural_images/projekt"
+#define CMAKE_PROJECT_ROOT_DIR "E:/procedurella/procedural_images/projekt"
 //#define CMAKE_PROJECT_ROOT_DIR "G:/LiU/Ak5/Procedurella/git-repot/procedural_images/projekt"
 
 // Constants
