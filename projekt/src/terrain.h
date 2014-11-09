@@ -31,8 +31,8 @@ public:
 private:
 	void loadShaders();
 	void printError(const char *functionName);
-	unsigned int getVertexCount() const { return kGridHeight*kGridHeight*3; }
-	unsigned int getIndexCount() const { return kGridHeight*kGridWidth + (kGridWidth-1)*(kGridHeight-2); }
+	unsigned int getVertexCount() const { return kNumVertsPerSide*kNumVertsPerSide*3; }
+	unsigned int getIndexCount() const { return kNumVertsPerSide*kNumVertsPerSide + (kNumVertsPerSide-1)*(kNumVertsPerSide-2); }
 
 private:
 	Fbo* fbo1;

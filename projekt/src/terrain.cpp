@@ -92,43 +92,43 @@ bool Terrain::generateGrid()
 
 	unsigned int i = 0;
 
-	for(unsigned int row=0; row<kGridHeight; ++row)
+	for(unsigned int row=0; row<kNumVertsPerSide; ++row)
 	{
-		for(unsigned int col=0; col<kGridWidth; ++col)
+		for(unsigned int col=0; col<kNumVertsPerSide; ++col)
 		{
-			_vertices[i++] = static_cast<GLfloat>(row)*kGridPointSpacing;
+			_vertices[i++] = static_cast<GLfloat>(row)*gGridPointSpacing;
 			_vertices[i++] = -10.0f;
-			_vertices[i++] = static_cast<GLfloat>(col)*kGridPointSpacing;
+			_vertices[i++] = static_cast<GLfloat>(col)*gGridPointSpacing;
 		}
 	}
 
 	i = 0;
 
-	for (unsigned int row=0; row<kGridHeight-1; row++ ) 
+	for (unsigned int row=0; row<kNumVertsPerSide-1; row++ ) 
 	{
         if ((row&1)==0) 
 		{ // even rows
-            for ( int col=0; col<kGridWidth; col++ ) 
+            for ( int col=0; col<kNumVertsPerSide; col++ ) 
 			{
-                _vertexIndices[i++] = col + row * kGridWidth;
-                _vertexIndices[i++] = col + (row+1) * kGridWidth;
+                _vertexIndices[i++] = col + row * kNumVertsPerSide;
+                _vertexIndices[i++] = col + (row+1) * kNumVertsPerSide;
             }
         }
 		else 
 		{ // odd rows
-            for (unsigned int col=kGridWidth-1; col>0; col-- ) 
+            for (unsigned int col=kNumVertsPerSide-1; col>0; col-- ) 
 			{
-                _vertexIndices[i++] = col + (row+1) * kGridWidth;
-                _vertexIndices[i++] = col - 1 + + row * kGridWidth;
+                _vertexIndices[i++] = col + (row+1) * kNumVertsPerSide;
+                _vertexIndices[i++] = col - 1 + + row * kNumVertsPerSide;
             }
         }
     }
 
 	i = 0;
 
-	for(unsigned int row=0; row<kGridHeight; ++row)
+	for(unsigned int row=0; row<kNumVertsPerSide; ++row)
 	{
-		for(unsigned int col=0; col<kGridWidth; ++col)
+		for(unsigned int col=0; col<kNumVertsPerSide; ++col)
 		{
 			_vertexNormals[i++] = 0.f;
 			_vertexNormals[i++] = 1.f;
@@ -190,9 +190,9 @@ void Terrain::render(const glm::mat4 &MV, const glm::mat4 &proj, const glm::vec3
 		glGetUniformLocation(shaderManager.getId(ShaderManager::shaderId::MAIN), "mvp"), 
 		1, GL_FALSE, glm::value_ptr(mvp) );
 	printError("mvp");
-	glUniform1ui(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "gridWidth"),kGridWidth);
-	glUniform1ui(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "gridHeight"),kGridHeight);
-	glUniform1f(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "gridSpacing"),kGridPointSpacing);
+	glUniform1ui(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "gridWidth"),kNumVertsPerSide);
+	glUniform1ui(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "gridHeight"),kNumVertsPerSide);
+	glUniform1f(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "gridSpacing"),gGridPointSpacing);
 	printError("grid dimensions");
 	// this is always the static cam pos, since it is only used to seed the terrain noise function in shader.
 	glUniform3fv(glGetUniformLocation(shaderManager.getId(ShaderManager::MAIN), "camPos"), 1, glm::value_ptr(campos));

@@ -12,9 +12,11 @@
 const int kWidth = 1280;
 const int kHeight = 720;
 
-const unsigned int kGridWidth = 800;
-const unsigned int kGridHeight = 800;
-const float kGridPointSpacing = .05f;
+const unsigned int kGridDim = 50;
+const unsigned int kNumVertsPerSide = 1000;
+const unsigned int kGridWidth = kGridDim;
+const unsigned int kGridHeight = kGridDim;
+const float gGridPointSpacing = (float)kGridDim/(float)kNumVertsPerSide;
 //const unsigned int kGridWidth = 200;
 //const unsigned int kGridHeight = 200;
 //const float kGridPointSpacing = .2f;

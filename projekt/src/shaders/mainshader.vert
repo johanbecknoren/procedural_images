@@ -86,7 +86,7 @@ uniform float waterLevel;
 
 float du = 1.f/float(gridWidth);
 float dv = 1.f/float(gridHeight);
-const float maxHeight = 1.5f;
+const float maxHeight = 1.6f;
 
 out VertexData {
 	vec3 normal;
