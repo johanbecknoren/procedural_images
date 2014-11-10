@@ -15,8 +15,8 @@ void Terrain::printError(const char *functionName)
 }
 
 void Terrain::loadShaders() {
-	shaderManager.loadShaders("mainshader.vert", "mainshader.frag", ShaderManager::shaderId::MAIN);
-	//shaderManager.loadShadersTG("tessellation.vert", "tessellation.frag", "tessellation.tcs", "tessellation.tes", "", ShaderManager::shaderId::MAIN);
+	//shaderManager.loadShaders("mainshader.vert", "mainshader.frag", ShaderManager::shaderId::MAIN);
+	shaderManager.loadShadersTG("tessellation.vert", "tessellation.frag", "tessellation.tcs", "tessellation.tes", "", ShaderManager::shaderId::MAIN);
 	//shaderManager.loadShaders("textureToScreen.vert", "textureToScreen.frag", ShaderManager::TEX2SCREEN);
 }
 
@@ -173,8 +173,8 @@ void Terrain::drawTerrain()
 	if(_drawWireframe)
 		glDrawElements(GL_LINE_LOOP, getIndexCount(), GL_UNSIGNED_INT, NULL);
 	else
-		glDrawElements(GL_TRIANGLE_STRIP, getIndexCount(), GL_UNSIGNED_INT, 0L);
-		//glDrawElements(GL_PATCHES, getIndexCount(), GL_UNSIGNED_INT, NULL);
+		//glDrawElements(GL_TRIANGLE_STRIP, getIndexCount(), GL_UNSIGNED_INT, 0L);
+		glDrawElements(GL_PATCHES, getIndexCount(), GL_UNSIGNED_INT, NULL);
 
 }
 

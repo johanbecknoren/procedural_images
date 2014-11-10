@@ -17,5 +17,5 @@ void main(void)
 
 	//gl_Position = vec4(in_Position, 1.0f);// pos;
 	//gl_Position = pos;
-	gl_Position = vec4(in_Position, 1.0f);
+	gl_Position = mvp*vec4(in_Position, 1.0f);
 }

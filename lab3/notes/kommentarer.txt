@@ -1,0 +1,3 @@
+Jag påbörjade visst den här labben i december 2013. Jag har kört visual studio på 64-bitars windows 7. Det borde gå att generera projekt med CMake men jag har inte prövat det nu, men det verkar ha fungerat i december 2013. Eventuellt kan shaderfilerna behöva kopieras manuellt.
+
+Bifogat finns i alla fall källkoden och en skärmdump. Gjorde ett skal/fjäll-liknande material på T-Rex mha worley noise, samt lite brunaktiga toner med hjälp av perlin noise i shaderkoden för vertex shadern.
