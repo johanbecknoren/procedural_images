@@ -1,0 +1,39 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx,url,placeins,algorithm,algorithmic,lipsum,amssymb,amsmath,subfigure,float}
+\usepackage[hidelinks]{hyperref}
+\usepackage[titletoc]{appendix}
+\usepackage{pdfpages}
+\usepackage{listings}
+\usepackage{layout}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage[utf8]{inputenc}
+\graphicspath{{figures/}}
+\setlength{\voffset}{0in}
+\setlength{\headsep}{5pt}
+\addtolength{\textheight}{2cm}
+\setlength{\footskip}{5pt}
+%
+\begin{document}
+
+\title{\vskip -6em Infinite Terrain in OpenGL \\ TNM084}   % type title between braces
+
+\author{
+ Johan Beck-Nor\'{e}n, johbe559@student.liu.se
+ }
+        \date{\today}    % type date between braces
+        \maketitle
+        
+\begin{enumerate}
+  \item Stefan Gustavssons implementation of 2D simplex noise in GLSL
+  \item Statiskt vertex grid + statisk cam, camerapos som seed till noisefunc, displace i Y-led mha noise
+  \item Ytnormaler för den displacade ytan beräknas mha finita differenser (partiella derivator) i vertex shadern.
+  \item Implementerat i OpenGL och GLSL. GLEW och GLFW används för GL-context och fönsterhantering.
+  \item Genom att hålla kameran statisk i förhållande till vertexgrid, men ändå göra translationsberäkningar på kameran,  så kan kamerapositionen skickas som uniform till VS och användas som seed till noise-funktionen. Eftersom noise-funtionen är deterministisk så kan vi förskjuta seeden med camerapos och på så sätt få illusionen att vi flyger över terrängen, när det i själva verket är vertices som endast förskjuts i höjdled.
+  \item Färgsättningen av terrängen är simpel och skapas genom att tröska vertices i Y-led till ett visst värde i VS, alla normalerna beräknas dock som vanligt. I FS ges blå färg till de fragment under ett visst tröskelvärde, och grön färg annars.
+  \item Simpel lighting model i FS med en ambient color och en directional ljuskälla
+  \item Fractal Brownian Motion
+  \item Nackdelar: - Det är dyrt att sampla noisefuntionen så ofta som jag gör, speciellt i och med de partiella derivatorna. Eftersom campos ändå skickas från CPUn hade det kanske varit mer performant att skapa en noise-textur på CPUn och ladda upp till GPUn istället.
+  \item Försökte förgäves att implementera tessellation, men utan resultat. Kortet i min workstation stöder upp t.o.m OpenGL 4.3 men lyckades ej 
+\end{enumerate}
+
+\end{document}
