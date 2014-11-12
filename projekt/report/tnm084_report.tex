@@ -15,7 +15,7 @@
 %
 \begin{document}
 
-\title{\vskip -6em Infinite Terrain in OpenGL \\ TNM084}   % type title between braces
+\title{\vskip -6em TNM084\\Interactive procedural terrain in OpenGL}   % type title between braces
 
 \author{
  Johan Beck-Nor\'{e}n, johbe559@student.liu.se
@@ -23,6 +23,29 @@
         \date{\today}    % type date between braces
         \maketitle
         
+\section{Background}
+For this project I created procedurally generated terrain. Terrain can be cumbersom to create by hand with explicitly defined geometry. It is a complex structure and can take a lot of time and effort to produce a convincing terrain geometry. Because of this procedural methods is a good and widely used method when creating large terrain geometry in computer graphics. For this project I have used an implementation of 2D simplex noise implemented in GLSL by Stefan Gustavsson [https://github.com/ashima/webgl-noise]. Using and combining simplex noise of different frequencies applies very well to terrain since terrain often have huge low-frequency variations such as peaks and valleys, as well as finer details of higher frequencies such as smaller hills and hollows. We achieve this by Fractional Brownian Motion (eq. \ref{eq:fbm}). This fits well since the variations of terrain is somewhat fractal in nature, with small hills on top of bigger hills etc.
+
+\begin{equation}
+\sum^{\text{num octaves}-1}_{i=0}noise(\vec{v}*freq_i)*amp_i
+\label{eq:fbm}
+\end{equation}
+
+In eq. \ref{eq:fbm} $\vec{v}$ is a two-dimensional vector, \textit{noise} is the 2D simplex noise function, $amp_i$ is the desired amplitude of the contribution to the final result by frequency $freq_i$. For this project we typically used an amplitude of $\frac{1}{2} amp_{i-1}$ for $amp_i$, and a $freq_i$ of $2*freq_{i-1}$. Manipulating the frequency by a factor of 2 is often referred to as using different octaves of that frequency.
+
+The terrain structure is created by displacing a flat vertex grid along one axis, similar to how one would use a heightmap for the same purpose. The displacement amount for each vertex is determined by eq. \ref{eq:fbm}. The normals are calculated in the same fashion, with the addition of using finite differences to approximate the surface derivatative at the vertex position. We do this by sampling the noise function at four points near the sample point $\vec{v}$, two points along each of the two axes $u$ and $v$. The partial derivatives are calculated as in eq. \ref{eq:normals}.
+
+\begin{equation}
+\begin{split}
+\frac{\partial noise}{\partial u} = \frac{noise(u+du, v)-noise(u-du,v)}{2*du} \\
+\frac{\partial noise}{\partial v} = \frac{noise(u, v+dv)-noise(u,v-dv)}{2*dv}
+\label{eq:normals}
+\end{split}
+\end{equation}
+
+\section{Implementation}
+The project was implemented in C++ using the OpenGL graphics API and GLSL shaders, along with the GL extension libraries GLEW and GLFW. During the startup of the program a uniform vertex grid is created on the CPU
+\section{Results}
 \begin{enumerate}
   \item Stefan Gustavssons implementation of 2D simplex noise in GLSL
   \item Statiskt vertex grid + statisk cam, camerapos som seed till noisefunc, displace i Y-led mha noise

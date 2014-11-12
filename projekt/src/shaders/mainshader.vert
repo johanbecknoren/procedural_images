@@ -84,8 +84,8 @@ uniform float gridSpacing;
 uniform int numberOfOctaves;
 uniform float waterLevel;
 
-float du = 1.f/float(gridWidth);
-float dv = 1.f/float(gridHeight);
+float du = .5f/float(gridWidth);
+float dv = .5f/float(gridHeight);
 const float maxHeight = 1.6f;
 
 out VertexData {
@@ -105,17 +105,17 @@ float normalizeDepth(float depth)
 // Surface differentials in u- and v directions
 float getDiffU(vec2 samplePos)
 {
-	return snoise(vec2(samplePos.x+du, samplePos.y)) - snoise(vec2(samplePos.x-du, samplePos.y));
+	return (snoise(vec2(samplePos.x+du, samplePos.y)) - snoise(vec2(samplePos.x-du, samplePos.y)))/(du*2.0);
 }
 float getDiffV(vec2 samplePos)
 {
-	return snoise(vec2(samplePos.x, samplePos.y+dv)) - snoise(vec2(samplePos.x, samplePos.y-dv));
+	return (snoise(vec2(samplePos.x, samplePos.y+dv)) - snoise(vec2(samplePos.x, samplePos.y-dv)))/(dv*2.0);
 }
 
 // http://mathworld.wolfram.com/NormalVector.html
 vec3 getNormalFromGrad(float udiff, float vdiff)
 {
-	return vec3(udiff, vdiff, 0.01f);
+	return vec3(udiff, vdiff, 3.f);
 }
 
 vec3 getNormalVector(vec2 samplePos)
@@ -150,7 +150,9 @@ vec4 sumOctaves(vec2 samplePos, float initFreq, float persistence)
 
 void main(void)
 {
-	vec2 sample = vec2(in_Position.x, in_Position.z) + camPos.xz;///float(gridSpacing);
+	/*gl_Position = mvp * vec4(in_Position, 1.0f);
+	return;*/
+	vec2 sample = vec2(in_Position.x, in_Position.z) + camPos.xz;
 	vec3 hmNorm = in_Normal;
 	vec3 hmPos = in_Position;
 
